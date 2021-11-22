@@ -39,13 +39,18 @@ public class CreateProjectHandler implements RequestHandler<CreateProjectRequest
 		String projectName = "";
 		
 		projectName = req.getProjectName();
+		
+		
+		//Code to add project name to RDS
 		try {
-		this.addProjectToRDS(projectName);
+			this.addProjectToRDS(projectName);
 		}catch(Exception e){
 			logger.log("Could not add project to RDS");
 		}
-		CreateProjectResponse response = new CreateProjectResponse(projectName, 200);
+
 		
+		
+		CreateProjectResponse response = new CreateProjectResponse(projectName, 200);
 		return response;
     }
     
