@@ -6,6 +6,8 @@ import java.util.List;
 
 //import edu.wpi.cs.heineman.demo.model.Constant;
 
+//import edu.wpi.cs.heineman.demo.model.Constant;
+
 /**
  * Note that CAPITALIZATION matters regarding the table name. If you create with 
  * a capital "Constants" then it must be "Constants" in the SQL queries.
@@ -23,6 +25,36 @@ public class DAO {
     	} catch (Exception e) {
     		conn = null;
     	}
+    }
+    
+    
+    public String addProject(String name) throws Exception{
+    	try {
+//            PreparedStatement ps = conn.prepareStatement("INSERT INTO");
+//            ps.setString(1, constant.name);
+//            ResultSet resultSet = ps.executeQuery();
+//            
+//            // already present?
+//            while (resultSet.next()) {
+//                Constant c = generateConstant(resultSet);
+//                resultSet.close();
+//                return false;
+//            }
+    		
+    		PreparedStatement ps;
+//            "INSERT INTO " + this.tblName + "(idProject, Archived) VALUES('" + name + "',false);"
+            ps = conn.prepareStatement("INSERT INTO " + tblName + " (idProject, Archived) values(?,?);");
+            ps.setString(1,  name);
+            ps.setBoolean(2,  false);
+            ps.execute();
+            return "";
+
+        } catch (Exception e) {
+//            throw new Exception("Failed to insert constant: " + e.getMessage());
+//        }
+    	
+    	
+    	return "";
     }
 
 //    public Constant getConstant(String name) throws Exception {
@@ -128,4 +160,5 @@ public class DAO {
 //        return new Constant (name, value);
 //    }
 
+}
 }

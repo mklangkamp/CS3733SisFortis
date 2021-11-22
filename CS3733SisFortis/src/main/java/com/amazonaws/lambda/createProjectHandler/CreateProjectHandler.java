@@ -20,6 +20,7 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.lambda.db.DAO;
 import com.amazonaws.lambda.http.*;
 
 public class CreateProjectHandler implements RequestHandler<CreateProjectRequest, CreateProjectResponse> {
@@ -38,9 +39,20 @@ public class CreateProjectHandler implements RequestHandler<CreateProjectRequest
 		String projectName = "";
 		
 		projectName = req.getProjectName();
-		
+		try {
+		this.addProjectToRDS(projectName);
+		}catch(Exception e){
+			logger.log("Could not add project to RDS");
+		}
 		CreateProjectResponse response = new CreateProjectResponse(projectName, 200);
 		
 		return response;
+    }
+    
+    
+    
+    public void addProjectToRDS(String name) throws Exception {
+    	DAO dao = new DAO();
+    	dao.addProject(name);
     }
 }
