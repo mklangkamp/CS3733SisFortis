@@ -24,7 +24,7 @@ public class DatabaseUtil {
 	public final static String rdsMySqlDatabasePort = "3306";
 	public final static String multiQueries = "?allowMultiQueries=true";
 	   
-	public final static String dbName = "CS3733SisFortis";           // Whatever Schema you created in tutorial.
+	public final static String dbName = "sisfortisdb2";           // Whatever Schema you created in tutorial.
 	public final static String testingName = "tmp";       // used for testing (also default created)
 	
 	// pooled across all usages.
@@ -46,14 +46,17 @@ public class DatabaseUtil {
 		}
 		
 		dbUsername = System.getenv("dbUsername");
+		dbUsername = "admin";
 		if (dbUsername == null) {
 			System.err.println("Environment variable dbUsername is not set!");
 		}
 		dbPassword = System.getenv("dbPassword");
+		dbPassword = "sisfortis";
 		if (dbPassword == null) {
 			System.err.println("Environment variable dbPassword is not set!");
 		}
 		rdsMySqlDatabaseUrl = System.getenv("rdsMySqlDatabaseUrl");
+		rdsMySqlDatabaseUrl = "sisfortisdb2.cniswfgeqr6c.us-east-2.rds.amazonaws.com";
 		if (rdsMySqlDatabaseUrl == null) {
 			System.err.println("Environment variable rdsMySqlDatabaseUrl is not set!");
 		}

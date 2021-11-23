@@ -3,10 +3,10 @@ package com.amazonaws.lambda.model;
 import java.util.ArrayList;
 
 public class Project {
-	String name;
-	ArrayList<Teammate> teammates;
-	ArrayList<Task> tasks;
-	Boolean archived;
+	public String name;
+	public ArrayList<Teammate> teammates;
+	public ArrayList<Task> tasks;
+	public Boolean archived;
 	
 	
 	public Project(String name) {
