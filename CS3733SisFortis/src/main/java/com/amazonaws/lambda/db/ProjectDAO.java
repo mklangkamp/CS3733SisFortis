@@ -27,6 +27,8 @@ java.sql.Connection conn;
     	}
     }
     
+    //this is a test
+    
     public boolean addProject(Project project) throws Exception {
       try {
     	  System.out.println("adding project");
