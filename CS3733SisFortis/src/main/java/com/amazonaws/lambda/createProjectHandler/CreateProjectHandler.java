@@ -30,11 +30,12 @@ public class CreateProjectHandler implements RequestHandler<CreateProjectRequest
 	
 	private AmazonS3 s3 = null;
 	
-	ProjectDAO dao = new ProjectDAO();
+	ProjectDAO dao;
 	
     @Override
     public CreateProjectResponse handleRequest(CreateProjectRequest req, Context context) {
     	logger = context.getLogger();
+    	dao = new ProjectDAO(logger);
     	logger.log("Loading Java Lambda handler of CreateProjectHandler");
 		logger.log(req.toString());
 		

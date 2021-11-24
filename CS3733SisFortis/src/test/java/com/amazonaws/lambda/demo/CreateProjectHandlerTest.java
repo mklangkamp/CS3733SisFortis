@@ -62,7 +62,7 @@ public class CreateProjectHandlerTest extends LambdaTest{
     
     @Test 
     public void testCreateProject() {
-    	String SAMPLE_INPUT = "{\"projectName\": \"aTestProjectName\"}";
+    	String SAMPLE_INPUT = "{\"projectName\": \"aTestProjectName2\"}";
     	String RESULT = "aTestProjectName";
     	
     	try {
@@ -75,7 +75,7 @@ public class CreateProjectHandlerTest extends LambdaTest{
     
     @Test 
     public void testCreateProject2() {
-    	String SAMPLE_INPUT = "{\"projectName\": \"aProjectName\"}";
+    	String SAMPLE_INPUT = "{\"projectName\": \"aProjectName2\"}";
     	String RESULT = "aProjectName";
     	
     	try {
