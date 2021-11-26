@@ -30,17 +30,9 @@ public class CreateProjectHandlerTest extends LambdaTest{
 	 * @param apiCall      An arbitrary string to identify which API is being called.
 	 * @return
 	 */
-//	Context createContext(String apiCall) {
-//        TestContext ctx = new TestContext();
-//        ctx.setFunctionName(apiCall);
-//        return ctx;
-//    }
 
     void testInput(String incoming, String outgoing) throws IOException {
     	CreateProjectHandler handler = new CreateProjectHandler();
-
-//        InputStream input = new ByteArrayInputStream(incoming.getBytes());
-//        OutputStream output = new ByteArrayOutputStream();
 
 		CreateProjectRequest req = new Gson().fromJson(incoming, CreateProjectRequest.class);
     	
@@ -50,13 +42,6 @@ public class CreateProjectHandlerTest extends LambdaTest{
 		Assert.assertEquals(outgoing, response.projectName);
         Assert.assertEquals(200, response.statusCode);
 		
-		
-//        handler.handleRequest(input, output, createContext("create Project"));
-//
-//        JsonNode outputNode = Jackson.fromJsonString(output.toString(), JsonNode.class);
-//        JsonNode body = Jackson.fromJsonString(outputNode.get("body").asText(), JsonNode.class);
-//        Assert.assertEquals(outgoing, body.get("projectName").asText());
-//        Assert.assertEquals("200", outputNode.get("statusCode").asText());
     }
 	
     
