@@ -4,6 +4,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.amazonaws.lambda.model.Project;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
+
 //import edu.wpi.cs.heineman.demo.model.Constant;
 
 /**
@@ -11,19 +14,61 @@ import java.util.List;
  * a capital "Constants" then it must be "Constants" in the SQL queries.
  *
  */
-public class DAO { 
+public class ProjectDAO { 
 
-	java.sql.Connection conn;
+java.sql.Connection conn;
 	
 	final String tblName = "Project";   // Exact capitalization
+	LambdaLogger logger;
 
-    public DAO() {
+    public ProjectDAO(LambdaLogger logger) {
+    	this.logger = logger;
     	try  {
+    		logger.log("Trying to connect to database");
     		conn = DatabaseUtil.connect();
+    		logger.log("Connected to database");
     	} catch (Exception e) {
+    		logger.log("failed to connect db");
     		conn = null;
     	}
     }
+    
+    //this is a test
+    
+    public boolean addProject(Project project) throws Exception {
+      try {
+    	  //System.out.println("adding project");
+    	  logger.log("adding project");
+          PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idProject = ?;");
+          ps.setString(1, project.name);
+          ResultSet resultSet = ps.executeQuery();
+          
+          // already present?
+          while (resultSet.next()) {
+        	  logger.log("in while loop");
+        	 // System.out.println("in while loop");
+              Project p = generateProject(resultSet);
+              resultSet.close();
+              return false;
+          }
+          
+          //System.out.println("outside while loop");
+          logger.log("outside of while loop");
+
+          ps = conn.prepareStatement("INSERT INTO " + tblName + " (idProject) values(?);");
+          ps.setString(1, project.name);
+          ps.execute();
+          logger.log("inserted into db");
+          return true;
+
+      } catch (Exception e) {
+          throw new Exception("Failed to insert constant: " + e.getMessage());
+      }
+  }
+    private Project generateProject(ResultSet resultSet) throws Exception {
+      String name  = resultSet.getString("name");
+      return new Project (name);
+  }
 
 //    public Constant getConstant(String name) throws Exception {
 //        

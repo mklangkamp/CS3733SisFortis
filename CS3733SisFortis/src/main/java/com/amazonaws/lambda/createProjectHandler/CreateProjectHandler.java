@@ -20,7 +20,9 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.lambda.db.ProjectDAO;
 import com.amazonaws.lambda.http.*;
+import com.amazonaws.lambda.model.Project;
 
 public class CreateProjectHandler implements RequestHandler<CreateProjectRequest, CreateProjectResponse> {
 
@@ -28,16 +30,25 @@ public class CreateProjectHandler implements RequestHandler<CreateProjectRequest
 	
 	private AmazonS3 s3 = null;
 	
+	ProjectDAO dao;
 	
     @Override
     public CreateProjectResponse handleRequest(CreateProjectRequest req, Context context) {
     	logger = context.getLogger();
+    	dao = new ProjectDAO(logger);
     	logger.log("Loading Java Lambda handler of CreateProjectHandler");
 		logger.log(req.toString());
 		
 		String projectName = "";
 		
 		projectName = req.getProjectName();
+		
+		try {
+			dao.addProject(new Project(projectName));
+		}
+		catch(Exception e){
+			System.out.println("Could not add project.");
+		}
 		
 		CreateProjectResponse response = new CreateProjectResponse(projectName, 200);
 		
