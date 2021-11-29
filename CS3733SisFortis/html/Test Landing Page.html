@@ -183,6 +183,8 @@
             //Send the data as JSON
             xhr.send();
 
+            document.getElementById("AdminProjectDisplayBox").innerHTML = "Loading Project Data from Database...";
+
             //Process result
             xhr.onloadend = function (){
                 console.log(xhr);
@@ -252,6 +254,8 @@
             //Send the data as JSON
             xhr.send(js);
 
+            document.getElementById("LandingPageNotification").innerHTML = "Working on creating project...";
+
             //Process result
             xhr.onloadend = function (){
                 console.log(xhr);
@@ -277,6 +281,8 @@
             var js = JSON.parse(result);
             if(result != "N/A"){
                 document.getElementById("LandingPageNotification").innerHTML = "Successfully created project: " + js["projectName"];
+            }else{
+                document.getElementById("LandingPageNotification").innerHTML = "Could not create project";
             }
         }
 
