@@ -25,12 +25,13 @@ public class ListProjectResponse {
 	}
 	
 	public String toString() {
-		String projectList = "";
-		projects.forEach((p) -> projectList.concat("," + p.name));
+		String projectList = "test";
+//		projects.forEach((p) -> projectList.concat("," + p.name));
 //		projects.forEach((p) -> System.out.println("," + p.name));
 //		System.out.println("Test".concat("123"));
 		System.out.println(projectList);
-		return "projects([" + projectList + "])";
+//		return "projects([" + projectList + "])";
+		return projectList;
 	}
 	
 }
