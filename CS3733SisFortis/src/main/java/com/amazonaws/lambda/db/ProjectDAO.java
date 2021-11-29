@@ -66,8 +66,34 @@ java.sql.Connection conn;
       }
   }
     private Project generateProject(ResultSet resultSet) throws Exception {
-      String name  = resultSet.getString("name");
+      String name  = resultSet.getString("idProject");
       return new Project (name);
+  }
+    
+    public ArrayList<Project> getAllProjects() throws Exception {
+      
+      ArrayList<Project> allProjects = new ArrayList<>();
+      try {
+          Statement statement = conn.createStatement();
+          String query = "SELECT * FROM " + tblName + ";";
+          ResultSet resultSet = statement.executeQuery(query);
+          
+//          logger.log("Got resultSet");
+          
+          while (resultSet.next()) {
+//        	  logger.log(resultSet.toString());
+              Project p = generateProject(resultSet);
+              logger.log(p.name);
+              allProjects.add(p);
+          }
+          logger.log("Projects added to allProjects");
+          resultSet.close();
+          statement.close();
+          return allProjects;
+
+      } catch (Exception e) {
+          throw new Exception("Failed in getting projects: " + e.getMessage());
+      }
   }
 
 //    public Constant getConstant(String name) throws Exception {
