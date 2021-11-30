@@ -70,31 +70,57 @@ java.sql.Connection conn;
       return new Project (name);
   }
     
+    
+    
+    
+    
     public ArrayList<Project> getAllProjects() throws Exception {
       
-      ArrayList<Project> allProjects = new ArrayList<>();
-      try {
-          Statement statement = conn.createStatement();
-          String query = "SELECT * FROM " + tblName + ";";
-          ResultSet resultSet = statement.executeQuery(query);
-          
-//          logger.log("Got resultSet");
-          
-          while (resultSet.next()) {
-//        	  logger.log(resultSet.toString());
-              Project p = generateProject(resultSet);
-              logger.log(p.name);
-              allProjects.add(p);
-          }
-          logger.log("Projects added to allProjects");
-          resultSet.close();
-          statement.close();
-          return allProjects;
-
-      } catch (Exception e) {
-          throw new Exception("Failed in getting projects: " + e.getMessage());
-      }
+	      ArrayList<Project> allProjects = new ArrayList<>();
+	      try {
+	          Statement statement = conn.createStatement();
+	          String query = "SELECT * FROM " + tblName + ";";
+	          ResultSet resultSet = statement.executeQuery(query);
+	          
+	//          logger.log("Got resultSet");
+	          
+	          while (resultSet.next()) {
+	//        	  logger.log(resultSet.toString());
+	              Project p = generateProject(resultSet);
+	              logger.log(p.name);
+	              allProjects.add(p);
+	          }
+	          logger.log("Projects added to allProjects");
+	          resultSet.close();
+	          statement.close();
+	          return allProjects;
+	
+	      } catch (Exception e) {
+	          throw new Exception("Failed in getting projects: " + e.getMessage());
+	      }
   }
+    
+    public Project getProject(String projectName) throws Exception {
+        
+        try {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idProject=? ;");
+            ps.setString(1, projectName);
+            ResultSet resultSet = ps.executeQuery();
+            
+            Project p = null;
+            while(resultSet.next()) {
+                p = generateProject(resultSet);
+            }
+
+            
+            resultSet.close();
+            ps.close();
+            return p;
+
+        } catch (Exception e) {
+            throw new Exception("Project Not Found: " + e.getMessage());
+        }
+    }
 
 //    public Constant getConstant(String name) throws Exception {
 //        
