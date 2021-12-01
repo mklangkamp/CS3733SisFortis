@@ -10,4 +10,9 @@ public class Teammate {
 		this.name = name;
 		this.taskList = taskList;
 	}
+	
+	
+	public Teammate() {
+		
+	}
 }

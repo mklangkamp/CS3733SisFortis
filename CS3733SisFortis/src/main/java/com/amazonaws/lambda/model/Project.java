@@ -14,5 +14,9 @@ public class Project {
 		this.archived = false;
 	}
 	
+	public Project() {
+		
+	}
+	
 
 }
