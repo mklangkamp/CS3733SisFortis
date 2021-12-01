@@ -93,6 +93,7 @@
         var createProjectURL = APIURL + "createProject";
         var listProjectsURL = APIURL + "listProjects"
         var projectViewURL = APIURL + "projectView"
+        var deleteProjectURL = APIURL + "deleteProject"
 
         //Variables to allow hiding/unhiding of each webpage
         var LandingPage = true;
@@ -115,7 +116,7 @@
             lastHighlightedRow = highlightedRow;
             highlightedRow = highlightedRow - 1;
             updateHighlightedRow();
-            document.getElementById("testP").innerHTML = highlightedRow;
+            // document.getElementById("testP").innerHTML = highlightedRow;
         }
 
         //Increments the highlighted row down one
@@ -126,7 +127,7 @@
             lastHighlightedRow = highlightedRow;
             highlightedRow = highlightedRow + 1;
             updateHighlightedRow();
-            document.getElementById("testP").innerHTML = highlightedRow;
+            // document.getElementById("testP").innerHTML = highlightedRow;
         }
 
         //Unhighlights previously selected row, and highlights newly selected row. 
@@ -145,7 +146,7 @@
             var form = document.ArchiveProjectForm;
 
             // form.AdminButton.value = textVal;
-            document.getElementById("testP").innerHTML = "archive";
+            // document.getElementById("testP").innerHTML = "archive";
         }
 
         function deleteProjectButtonPress(e){
@@ -153,8 +154,62 @@
             // var textVal = form.textBox.value;
 
             // form.OpenProjectButton.value = textVal;
-            document.getElementById("testP").innerHTML = "delete";
+            // document.getElementById("testP").innerHTML = "delete";
+
+            //Delete project and update list once project is deleted
+            deleteProject();
+
+
         }
+
+        function deleteProject(){
+            var projectName = document.getElementById(highlightedRow).innerHTML;
+            var data = {};
+            data["projectName"] = projectName;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", deleteProjectURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            document.getElementById("AdminPageNotification").innerHTML = "Working on deleting project...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processDeleteProjectResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processDeleteProjectResponse("N/A");
+                }
+            };
+        }
+
+        //Print the created project name to screen
+        function processDeleteProjectResponse(result){
+            console.log("result:" + result);
+            var js = JSON.parse(result);
+            if(result != "N/A"){
+                getProjectList();
+                document.getElementById("AdminPageNotification").innerHTML = "Successfully deleted project: " + js["projectName"];
+                highlightedRow = 1;
+                lastHighlightedRow = 1;
+                updateHighlightedRow();
+            }else{
+                document.getElementById("AdminPageNotification").innerHTML = "Could not delete project";
+            }
+        }
+        
 
         
 
@@ -224,8 +279,8 @@
             });
 
             console.log(str);
-
             document.getElementById("AdminProjectDisplayBox").innerHTML = str;
+            updateHighlightedRow();
         }
 
         //Runs when open project button is pressed
@@ -444,7 +499,7 @@
 
 
         <br style="line-height: 80px;">
-        <p id="testP" hidden></p>
+        <p id="AdminPageNotification" hidden></p>
 
     </div>
     </div>
