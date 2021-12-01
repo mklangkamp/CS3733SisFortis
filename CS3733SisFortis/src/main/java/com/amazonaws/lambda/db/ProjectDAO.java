@@ -62,17 +62,32 @@ java.sql.Connection conn;
           return true;
 
       } catch (Exception e) {
-          throw new Exception("Failed to insert constant: " + e.getMessage());
+          throw new Exception("Failed to add: " + e.getMessage());
       }
   }
+    
+    
+    public boolean deleteProject(Project project) throws Exception {
+        try {
+      	  //System.out.println("adding project");
+      	  logger.log("deleting project");
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idProject = ?;");
+            ps.setString(1, project.name);
+            int numAffected = ps.executeUpdate();
+            
+            return (numAffected == 1);
+
+        } catch (Exception e) {
+            throw new Exception("Failed to delete: " + e.getMessage());
+        }
+        
+        
+    }
+    
     private Project generateProject(ResultSet resultSet) throws Exception {
       String name  = resultSet.getString("idProject");
       return new Project (name);
   }
-    
-    
-    
-    
     
     public ArrayList<Project> getAllProjects() throws Exception {
       
