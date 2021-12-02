@@ -9,9 +9,9 @@ import java.io.OutputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.amazonaws.lambda.addTeammateHandler.AddTeammateHandler;
-import com.amazonaws.lambda.http.AddTeammateRequest;
-import com.amazonaws.lambda.http.AddTeammateResponse;
+import com.amazonaws.lambda.removeTeammateHandler.RemoveTeammateHandler;
+import com.amazonaws.lambda.http.RemoveTeammateRequest;
+import com.amazonaws.lambda.http.RemoveTeammateResponse;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 /**
  * A simple test harness for locally invoking your Lambda function handler.
  */
-public class AddTeammateHandlerTest extends LambdaTest{
+public class RemoveTeammateHandlerTest extends LambdaTest{
 	
 	/**
 	 * Helper method that creates a context that supports logging so you can test lambda functions
@@ -33,11 +33,11 @@ public class AddTeammateHandlerTest extends LambdaTest{
 	 */
 
     void testInput(String incoming, String outgoing) throws IOException {
-    	AddTeammateHandler handler = new AddTeammateHandler();
+    	RemoveTeammateHandler handler = new RemoveTeammateHandler();
 
-    	AddTeammateRequest req = new Gson().fromJson(incoming, AddTeammateRequest.class);
+    	RemoveTeammateRequest req = new Gson().fromJson(incoming, RemoveTeammateRequest.class);
     	
-    	AddTeammateResponse response = handler.handleRequest(req, createContext("Add Teammate"));
+    	RemoveTeammateResponse response = handler.handleRequest(req, createContext("Remove Teammate"));
 		
 		
 		Assert.assertEquals(outgoing, response.teammateName);
@@ -47,7 +47,7 @@ public class AddTeammateHandlerTest extends LambdaTest{
 	
     
     @Test 
-    public void testAddTeammate() {
+    public void testRemoveTeammate() {
     	String SAMPLE_INPUT = "{\"project\": {\"name\":\"abc\"},\"teammate\":{\"name\":\"Mike_Hawk\"}}";
     	String RESULT = "Mike_Hawk";
     	

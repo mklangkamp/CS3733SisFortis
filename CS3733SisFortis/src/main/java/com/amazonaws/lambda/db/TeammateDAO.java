@@ -61,6 +61,22 @@ java.sql.Connection conn;
         }
     }
     
+    public boolean removeTeammate(Project project, Teammate teammate) throws Exception {
+        try {
+      	  //System.out.println("adding project");
+      	  logger.log("removing teammate");
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE (idTeammate,Project) = (?,?);");
+            ps.setString(1, teammate.name);
+            ps.setString(2, project.name);
+            int numAffected = ps.executeUpdate();
+            logger.log("numAffected: " + numAffected);
+            return (numAffected == 1);
+
+        } catch (Exception e) {
+            throw new Exception("Failed to delete: " + e.getMessage());
+        }
+    }
+    
         private Teammate generateTeammate(ResultSet resultSet) throws Exception {
             String name  = resultSet.getString("idTeammate");
             return new Teammate(name);
