@@ -349,7 +349,8 @@
             try {
                 project = js["project"];
                 projectName = project["name"];                
-                document.getElementById("ProjectNameHeader").innerHTML = projectName;
+                document.getElementById("ProjectNameHeader").innerHTML = projectName + " Team View";
+                document.getElementById("ProjectViewHeader").innerHTML = projectName + " Project View";
                 document.getElementById("LandingPage").hidden = true;
                 document.getElementById("AdminPage").hidden = true;
                 document.getElementById("UserPage").hidden = false;
@@ -412,6 +413,29 @@
                 document.getElementById("LandingPageNotification").innerHTML = "Could not create project";
             }
         }
+        // USER PAGE
+
+        function changeToProjectViewButtonPress(){
+            document.getElementById ("TeamView").hidden = true;
+            document.getElementById ("ProjectView").hidden = false;
+
+        }
+
+
+        function changeToTeamViewButtonPress(){
+            document.getElementById ("ProjectView").hidden = true;
+            document.getElementById ("TeamView").hidden = false;
+        }
+
+        function addTaskButtonPress(){
+            
+        }
+
+        //---------------------------------------------------------------------
+        
+
+
+
 
     </script>
 
@@ -608,7 +632,7 @@
         <div class="split left" id="leftColumn">
             <div class="centered">
                 <br style="line-height: 30px;"> 
-                <header id="ProjectNameHeader"  class="header">
+                <header id="ProjectViewHeader"  class="header">
                     
                 </header>
                 <br>
@@ -618,6 +642,7 @@
             <div class="box centered">
                 <div class="outline" id="outlineBox">
                     <b>
+                        <div>test </div>
                     <!-- <div id="1">1 Task 1</div>
                     <div id="2">&emsp;&emsp;1.1 Task 1.1</div>
                     <div id="3">&emsp;&emsp;1.2 Task 1.2</div>
@@ -662,23 +687,47 @@
 
                 <br style="line-height: 80px;">
                 <form name="TextBoxForm" method="post">
-                    <input type="text" value="" class="textBox" id="textBox">
+                    <input type="text" value="" class="textBox" id="ProjectViewTaskInput">
                 </form>
                 
                 
-                <form name="AddTeammateForm" method="post"> 
-                    <input type="button" value="Add Teammate to Project" class="button" id="AddTeammateButton" onclick="JavaScript:addTeammateButtonPress()"></button>
+                <form name="AddTaskForm" method="post"> 
+                    <input type="button" value="Add New Task(s)" class="button" id="AddTaskButton" onclick="JavaScript:addTaskButtonPress()"></button>
                 </form>
 
-                <form name="RemoveTeammateForm" method="post" >
-                    <input type="button" value="Remove Selected Teammate" class="button" id="RemoveTeammateButton" onclick="JavaScript:removeTeammateButtonPress()"></button>
+                <form name="AddNewSubTasks" method="post" >
+                    <input type="button" value="Add New Subtask(s)" class="button" id="AddSubtaskButton" onclick="JavaScript:addSubtaskButtonPress()"></button>
                 </form>
+                
+                <br style="line-height: 40px;">
+                
+                
+                <form name="TextBoxForm" method="post">
+                    <input type="text" value="" class="textBox" id="ProjectViewTeammateInput">
+                </form>
+                
+                
+                <form name="AssignTeammateForm" method="post"> 
+                    <input type="button" value="Assign Teammate(s) To Task" class="button" id="AssignTeammateButton" onclick="JavaScript:AssignTeammateButtonPress()"></button>
+                </form>
+
+                <form name="UnassignTeammate" method="post" >
+                    <input type="button" value="Unassign Selected Teammate" class="button" id="UnassignTeammateButton" onclick="JavaScript:UnassignTeammateButtonPress()"></button>
+                </form>
+
+                <br style="line-height: 40px;">
+
+                <form name="MarkTaskCompleteForm" method="post" >
+                    <input type="button" value="Mark Selected Task Complete" class="button" id="MarkSelectedTaskButton" onclick="JavaScript:MarkSelectedTaskButtonPress()"></button>
+                </form>
+
+
 
                 <br style="line-height: 80px;">
 
 
                 <form name="ChangeToProjectViewForm" method="post" >
-                    <input type="button" value="Switch to Project View" class="button" id="ProjectViewButton" onclick="JavaScript:changeToProjectViewButtonPress()"></button>
+                    <input type="button" value="Switch to Team View" class="button" id="TeamViewButton" onclick="JavaScript:changeToTeamViewButtonPress()"></button>
                 </form>
 
                 <br style="line-height: 80px;">
