@@ -94,6 +94,7 @@
         var listProjectsURL = APIURL + "listProjects";
         var projectViewURL = APIURL + "projectView";
         var deleteProjectURL = APIURL + "deleteProject";
+        var addTaskURL = APIURL + "addTasks";
 
         //Variables to allow hiding/unhiding of each webpage
         var LandingPage = true;
@@ -413,25 +414,77 @@
                 document.getElementById("LandingPageNotification").innerHTML = "Could not create project";
             }
         }
-        // USER PAGE
+        // USER PAGE FUNCTIONS ---------------------------------------------------------------------
 
+
+        //Hides Team view tab and shows project view tab
         function changeToProjectViewButtonPress(){
             document.getElementById ("TeamView").hidden = true;
             document.getElementById ("ProjectView").hidden = false;
-
         }
 
-
+        //Hides project view tab and shows team view
         function changeToTeamViewButtonPress(){
             document.getElementById ("ProjectView").hidden = true;
             document.getElementById ("TeamView").hidden = false;
         }
 
         function addTaskButtonPress(){
-            
+            var taskName = document.getElementById("ProjectViewTaskInput").value;
+            var projectName = document.testForm.textBox.value;
+
+            var task = {};
+            task["name"] = taskName;
+            task["id"] = "1.1.1";/////////////////////////////////////////////////////////////////////////////////// ADD CODE TO DETERMINE NEXT TASK ID
+
+            var project = {};
+            project["name"] = projectName;
+
+            var data = {};
+            data["task"] = task;
+            data["project"] = project;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", addTaskURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            document.getElementById("ProjectViewNotification").innerHTML = "Working on adding task...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processAddTaskResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processAddTaskResponse("N/A");
+                }
+            };
         }
 
-        //---------------------------------------------------------------------
+
+        function processAddTaskResponse(result){
+            console.log("result:" + result);
+            var js = JSON.parse(result);
+            if(result != "N/A"){
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully created task: " + js["taskName"];
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////RUN CODE TO UPDATE LIST OF TASKS
+            }else{
+                document.getElementById("LandingPageNotification").innerHTML = "Could not create project";
+            }
+        }
+
+        
         
 
 
@@ -584,7 +637,7 @@
             <div class="centered">        
                 <br style="line-height: 30px;"> 
                 <header id="UserPageToolsHeader"  class="header">
-                    Project Modification Tools
+                    Project Tools
                 </header>
 
                 <br style="line-height: 30px;">
@@ -670,7 +723,7 @@
             <div class="centered">        
                 <br style="line-height: 30px;"> 
                 <header id="UserPageToolsHeader"  class="header">
-                    Project Modification Tools
+                    Project Tools
                 </header>
 
                 <br style="line-height: 30px;">
@@ -685,7 +738,7 @@
 
 
 
-                <br style="line-height: 80px;">
+                <br style="line-height:  40px;">
                 <form name="TextBoxForm" method="post">
                     <input type="text" value="" class="textBox" id="ProjectViewTaskInput">
                 </form>
@@ -699,7 +752,7 @@
                     <input type="button" value="Add New Subtask(s)" class="button" id="AddSubtaskButton" onclick="JavaScript:addSubtaskButtonPress()"></button>
                 </form>
                 
-                <br style="line-height: 40px;">
+                <br style="line-height: 30px;">
                 
                 
                 <form name="TextBoxForm" method="post">
@@ -715,7 +768,7 @@
                     <input type="button" value="Unassign Selected Teammate" class="button" id="UnassignTeammateButton" onclick="JavaScript:UnassignTeammateButtonPress()"></button>
                 </form>
 
-                <br style="line-height: 40px;">
+                <br style="line-height: 30px;">
 
                 <form name="MarkTaskCompleteForm" method="post" >
                     <input type="button" value="Mark Selected Task Complete" class="button" id="MarkSelectedTaskButton" onclick="JavaScript:MarkSelectedTaskButtonPress()"></button>
@@ -723,15 +776,15 @@
 
 
 
-                <br style="line-height: 80px;">
+                <br style="line-height: 30px;">
 
 
-                <form name="ChangeToProjectViewForm" method="post" >
+                <form name="ChangeToTeamViewForm" method="post" >
                     <input type="button" value="Switch to Team View" class="button" id="TeamViewButton" onclick="JavaScript:changeToTeamViewButtonPress()"></button>
                 </form>
 
-                <br style="line-height: 80px;">
-                <p id="testP" onload="JavaScript:onLoadFunction"></p>
+                <br style="line-height: 30px;">
+                <p id="ProjectViewNotification"></p>
 
             </div>
         </div>
