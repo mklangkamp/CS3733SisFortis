@@ -281,20 +281,37 @@
 
             projectList = js["projects"];
 
-            try{
-                console.log("projects: " + projectList);
-                console.log(projectList[0].name);
-                var str = "";
-                var projectNum = 1;
+            
+            console.log("projects: " + projectList);
+            console.log(projectList[0].name);
+            var str = "";
+            var rowNum = 1;
+            var t = "&emsp;&emsp;";
+
+            // project = js["project"];
+            // projectName = project["name"];
+            // tasks = project["tasks"];
+
+            projectList.forEach(project => {
+                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + project.name + "</div>";
+                rowNum = rowNum + 1;
+
+                try{
+                    teammates = project["teammates"];
+                    teammates.forEach(teammate => {
+                        str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + t + teammate.name + "</div>";
+                    })
+                }catch{
+                    console.log("Error parsing teammates for project");
+                }
+                
+
 
                 
-                projectList.forEach(project => {
-                    str =  str + '\n' + "<div name=\"" + projectNum + "\" id=\"" + projectNum + "\">" + project.name + "</div>";
-                    projectNum = projectNum + 1;
-                });
-            }catch{
-                str = "No Projects Stored in Database"
-            }
+            });
+        
+            // str = "No Projects Stored in Database"
+            
 
             
             console.log(str);
