@@ -110,6 +110,11 @@
         
         //Increments the highlighted row up one
         function upArrowButtonPress(){
+            if(document.getElementById(highlightedRow) == null){//If the highlighted row doesnt exist, reset to row 1
+                highlightedRow = 1;
+                lastHighlightedRow = 1;
+                return;
+            }
             if(document.getElementById(highlightedRow - 1) == null){
                 return;
             }
@@ -122,6 +127,11 @@
 
         //Increments the highlighted row down one
         function downArrowButtonPress(){
+            if(document.getElementById(highlightedRow) == null){//If the highlighted row doesnt exist, reset to row 1
+                highlightedRow = 1;
+                lastHighlightedRow = 1;
+                return;
+            }
             if(document.getElementById(highlightedRow + 1) == null){
                 return;
             }
@@ -147,6 +157,12 @@
             }catch{
 
             }
+        }
+
+        function writeToDisplayBox(str){
+            var elements = document.getElementsByName("AdminProjectDisplayBox");
+            console.log(elements.id);
+            elements.forEach(element => element.innerHTML = str);
         }
 
         //ADMIN PAGE FUNCTIONS ---------------------------------------------------------
@@ -289,8 +305,10 @@
                 str = "No Projects Stored in Database"
             }
 
+            
             console.log(str);
-            document.getElementById("AdminProjectDisplayBox").innerHTML = str;
+            // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
+            writeToDisplayBox(str);
             updateHighlightedRow();
         }
 
@@ -349,7 +367,7 @@
 
             try {
                 project = js["project"];
-                projectName = project["name"];                
+                projectName = project["name"];
                 document.getElementById("ProjectNameHeader").innerHTML = projectName + " Team View";
                 document.getElementById("ProjectViewHeader").innerHTML = projectName + " Project View";
                 document.getElementById("LandingPage").hidden = true;
@@ -361,8 +379,63 @@
                 document.getElementById("AdminPage").hidden = true;
                 document.getElementById("UserPage").hidden = true;
             }
+        }
 
 
+        //POST Request for getting project info (to be used to display)
+        function listProjectInfo(){
+            var form = document.testForm;
+            var textVal = form.textBox.value;
+
+            var data = {};
+            data["projectName"] = textVal;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", projectViewURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+    
+            document.getElementById("ProjectNameHeader").innerHTML = "Loading project...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        displayProjectInfo(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    displayProjectInfo("N/A");
+                }
+            };
+        }
+
+        function displayProjectInfo(result){
+            if(result == "N/A"){return;} //Return if didnt get anything useful
+            console.log("result:" + result);
+            var js = JSON.parse(result);
+
+            try {
+                project = js["project"];
+                projectName = project["name"];
+            } catch (error) {
+                document.getElementById("LandingPageNotification").innerHTML = "Could not find project: " + textVal;
+            }
+
+            if(document.getElementById("ProjectView").hidden){//If project view is hidden then display in the TEAM VIEW
+
+            }
+            if(document.getElementById("TeamView").hidden){//If team view is hidden then display in PROJECT VIEW
+
+            }
         }
 
         //Runs when the create project button is pressed
@@ -532,7 +605,7 @@
         
     
         <div class="box centered">
-            <div class="outline" id="AdminProjectDisplayBox">
+            <div class="outline" id="AdminProjectDisplayBox" name="AdminProjectDisplayBox">
                 <b>
                 <!-- <div id="1">1 Task 1</div>
                 <div id="2">&emsp;&emsp;1.1 Task 1.1</div>
@@ -608,7 +681,7 @@
             
         
             <div class="box centered">
-                <div class="outline" id="outlineBox">
+                <div class="outline" id="AdminProjectDisplayBox" name="AdminProjectDisplayBox">
                     <b>
                     <!-- <div id="1">1 Task 1</div>
                     <div id="2">&emsp;&emsp;1.1 Task 1.1</div>
@@ -693,7 +766,7 @@
             
         
             <div class="box centered">
-                <div class="outline" id="outlineBox">
+                <div class="outline" id="outlineBox" name="AdminProjectDisplayBox">
                     <b>
                         <div>test </div>
                     <!-- <div id="1">1 Task 1</div>
