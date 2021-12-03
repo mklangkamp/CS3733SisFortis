@@ -264,7 +264,8 @@
             //Send the data as JSON
             xhr.send();
 
-            document.getElementById("AdminProjectDisplayBox").innerHTML = "Loading Project Data from Database...";
+            // document.getElementById("AdminProjectDisplayBox").innerHTML = "Loading Project Data from Database...";
+            writeToDisplayBox("Loading Project Data from Database...");
 
             //Process result
             xhr.onloadend = function (){
@@ -335,10 +336,13 @@
             var xhr = new XMLHttpRequest();
             xhr.open("POST", projectViewURL, true);
 
+
+            document.getElementById("LandingPageNotification").innerHTML = "Loading project...";
+
             //Send the data as JSON
             xhr.send(js);
     
-            document.getElementById("ProjectNameHeader").innerHTML = "Loading project...";
+            
 
             //Process result
             xhr.onloadend = function (){
@@ -370,6 +374,7 @@
                 projectName = project["name"];
                 document.getElementById("ProjectNameHeader").innerHTML = projectName + " Team View";
                 document.getElementById("ProjectViewHeader").innerHTML = projectName + " Project View";
+                document.getElementById("LandingPageNotification").innerHTML = "";//Remove previous text from landing page notification
                 document.getElementById("LandingPage").hidden = true;
                 document.getElementById("AdminPage").hidden = true;
                 document.getElementById("UserPage").hidden = false;
