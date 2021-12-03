@@ -16,12 +16,14 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
  */
 public class ProjectDAO { 
 
-java.sql.Connection conn;
+	java.sql.Connection conn;
+	TaskDAO taskDAO;
 	
 	final String tblName = "Project";   // Exact capitalization
 	LambdaLogger logger;
 
     public ProjectDAO(LambdaLogger logger) {
+    	taskDAO = new TaskDAO(logger);
     	this.logger = logger;
     	try  {
     		logger.log("Trying to connect to database");
@@ -84,7 +86,16 @@ java.sql.Connection conn;
     
     private Project generateProject(ResultSet resultSet) throws Exception {
       String name  = resultSet.getString("idProject");
-      return new Project (name);
+      Project p = new Project (name);
+      
+      //Try to get tasks for project
+      try {
+			p.tasks = taskDAO.getTasksForProject(p);
+		}catch(Exception e) {
+			logger.log("Could not find tasks for: " + name);
+		}
+      
+      return p;
   }
     
     public ArrayList<Project> getAllProjects() throws Exception {

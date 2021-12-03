@@ -31,22 +31,18 @@ java.sql.Connection conn;
     public boolean addTask(Project project, Task task) throws Exception {
         try {
       	  logger.log("adding task");
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ?;");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? and Project = ?;");
             ps.setString(1, task.id);
+            ps.setString(2, project.name);
             ResultSet resultSet = ps.executeQuery();
-            
-            logger.log("before while");
             
             while (resultSet.next()) {
                 resultSet.close();
-                return false;
+                logger.log("Task already exists, could not add.");
+                return false; //IF the taskID and the project name are already in the project, dont insert it.
             }
-
-            logger.log("after a while");
             
             ps = conn.prepareStatement("INSERT INTO " + tblName + " (idTask,Name,Status,Project) values(?,?,?,?);");
-            
-            logger.log("??????");
             
             ps.setString(1, task.id);
             ps.setString(2, task.name);
@@ -54,9 +50,7 @@ java.sql.Connection conn;
             // if this is a subtask, this should not be null (null for top level tasks only, iteration #2)
             //ps.setString(4, null);
             ps.setString(4, project.name);
-            logger.log("before execute");
             ps.execute();
-            logger.log("inserted into db");
             return true;
 
         } catch (Exception e) {

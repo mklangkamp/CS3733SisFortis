@@ -46,12 +46,13 @@ public class ProjectViewHandler implements RequestHandler<ProjectViewRequest, Pr
 			System.out.println("Could not find project.");
 		}
 		
+		//MOVED TO ProjectDAO generateProject method.
 		//Try to get tasks associated with that project
-		try {
-			p.tasks = taskDAO.getTasksForProject(p);
-		}catch(Exception e) {
-			logger.log("Could not find tasks for: " + projectName);
-		}
+//		try {
+//			p.tasks = taskDAO.getTasksForProject(p);
+//		}catch(Exception e) {
+//			logger.log("Could not find tasks for: " + projectName);
+//		}
 		
 		ProjectViewResponse response = new ProjectViewResponse(p, 200);
 		
