@@ -28,11 +28,11 @@ java.sql.Connection conn;
     	}
     }
 	
-    public boolean addTeammate(Project project, Teammate teammate) throws Exception {
+    public boolean addTeammate(String projectName, String teammateName) throws Exception {
         try {
       	  logger.log("adding teammate");
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTeammate = ?;");
-            ps.setString(1, teammate.name);
+            ps.setString(1, teammateName);
             ResultSet resultSet = ps.executeQuery();
             
             logger.log("before while");
@@ -48,8 +48,8 @@ java.sql.Connection conn;
             
             logger.log("??");
             
-            ps.setString(1, teammate.name);
-            ps.setString(2, project.name);
+            ps.setString(1, teammateName);
+            ps.setString(2, projectName);
             
             logger.log("before execute");
             ps.execute();
@@ -61,13 +61,13 @@ java.sql.Connection conn;
         }
     }
     
-    public boolean removeTeammate(Project project, Teammate teammate) throws Exception {
+    public boolean removeTeammate(String projectName, String teammateName) throws Exception {
         try {
       	  //System.out.println("adding project");
       	  logger.log("removing teammate");
             PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE (idTeammate,Project) = (?,?);");
-            ps.setString(1, teammate.name);
-            ps.setString(2, project.name);
+            ps.setString(1, teammateName);
+            ps.setString(2, projectName);
             int numAffected = ps.executeUpdate();
             logger.log("numAffected: " + numAffected);
             return (numAffected == 1);

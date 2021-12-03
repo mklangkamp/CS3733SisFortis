@@ -6,22 +6,22 @@ import com.amazonaws.lambda.model.Project;
 import com.amazonaws.lambda.model.Teammate;
 
 public class RemoveTeammateRequest {
-	public Teammate teammate;
-	public Project project;
+	public String teammateName;
+	public String projectName;
 	
-	public String getTeammateName() {return this.teammate.name;}
-	public String getProjectName() {return this.project.name;}
+	public String getTeammateName() {return this.teammateName;}
+	public String getProjectName() {return this.projectName;}
 	
-	public RemoveTeammateRequest(Project project, Teammate teammate) {
-		this.project = project;
-		this.teammate = teammate;
+	public RemoveTeammateRequest(String projectName, String teammateName) {
+		this.projectName = projectName;
+		this.teammateName = teammateName;
 	}
 	
 	public RemoveTeammateRequest() {
 	}
 	
 	public String toString() {
-		return "Requested to remove teammate with name: " + this.teammate.name;
+		return "Requested to remove teammate with name: " + this.teammateName;
 	}
 
 }

@@ -42,13 +42,13 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 		
 		
 		try {
-			dao.removeTeammate(req.project, req.teammate);
+			dao.removeTeammate(req.projectName, req.teammateName);
 		}
 		catch(Exception e){
 			System.out.println("Could not remove teammate.");
 		}
 		
-		RemoveTeammateResponse response = new RemoveTeammateResponse(req.teammate.name, 200);
+		RemoveTeammateResponse response = new RemoveTeammateResponse(req.teammateName, 200);
 		
 		return response;
     }

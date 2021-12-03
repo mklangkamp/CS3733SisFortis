@@ -42,13 +42,13 @@ public class AddTeammateHandler implements RequestHandler<AddTeammateRequest, Ad
 		
 		
 		try {
-			dao.addTeammate(req.project, req.teammate);
+			dao.addTeammate(req.projectName, req.teammateName);
 		}
 		catch(Exception e){
 			System.out.println("Could not add teammate.");
 		}
 		
-		AddTeammateResponse response = new AddTeammateResponse(req.teammate.name, 200);
+		AddTeammateResponse response = new AddTeammateResponse(req.teammateName, 200);
 		
 		return response;
     }
