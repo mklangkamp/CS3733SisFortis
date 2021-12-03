@@ -68,7 +68,7 @@ java.sql.Connection conn;
     public boolean deleteProject(Project project) throws Exception {
         try {
       	  //System.out.println("adding project");
-      	  logger.log("deleting project");
+      	  	logger.log("deleting project");
             PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idProject = ?;");
             ps.setString(1, project.name);
             int numAffected = ps.executeUpdate();
@@ -124,8 +124,6 @@ java.sql.Connection conn;
             while(resultSet.next()) {
                 p = generateProject(resultSet);
             }
-
-            
             resultSet.close();
             ps.close();
             return p;

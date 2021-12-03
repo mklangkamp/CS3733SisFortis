@@ -38,10 +38,15 @@ public class ProjectViewHandlerTest extends LambdaTest{
     	
 		ProjectViewResponse response = handler.handleRequest(req, createContext("Find Project"));
 		
+		printTasks(response);
 		
 		Assert.assertEquals(outgoing, response.project.name); 
         Assert.assertEquals(200, response.statusCode);
-		
+    }
+    
+    
+    void printTasks(ProjectViewResponse response) {
+    	response.project.tasks.forEach(task -> System.out.println(task.name));
     }
 	
     
@@ -61,6 +66,18 @@ public class ProjectViewHandlerTest extends LambdaTest{
     public void testProjectView2() {
     	String SAMPLE_INPUT = "{\"projectName\": \"aa\"}";
     	String RESULT = "aa";
+    	
+    	try {
+    		testInput(SAMPLE_INPUT, RESULT);
+    	}catch (IOException ioe) {
+    		Assert.fail("Invalid:" + ioe.getMessage());
+    	}
+    }
+    
+    @Test
+    public void testProjectView3() {
+    	String SAMPLE_INPUT = "{\"projectName\": \"abc\"}";
+    	String RESULT = "abc";
     	
     	try {
     		testInput(SAMPLE_INPUT, RESULT);

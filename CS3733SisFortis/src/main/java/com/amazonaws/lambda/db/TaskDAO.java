@@ -64,10 +64,33 @@ java.sql.Connection conn;
         }
     }
     
+    
+    public ArrayList<Task> getTasksForProject(Project p) throws Exception {
+        try {
+      	  	logger.log("getting Tasks for: " + p.name);
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE Project = ?;");
+            ps.setString(1, p.name);
+            ResultSet resultSet = ps.executeQuery();
+                     
+            ArrayList<Task> taskList = new ArrayList<Task>();
+            
+            while (resultSet.next()) {
+                taskList.add(generateTask(resultSet));
+            }
+            resultSet.close();
+
+            return taskList;
+
+        } catch (Exception e) {
+            throw new Exception("Failed to add: " + e.getMessage());
+        }
+    }
+    
         private Task generateTask(ResultSet resultSet) throws Exception {
             String id  = resultSet.getString("idTask");
             String name = resultSet.getString("Name");
-            return new Task (id, name);
+            Boolean status = resultSet.getBoolean("Status");
+            return new Task (id, name, status);
         }
         
 }
