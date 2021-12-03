@@ -15,5 +15,4 @@ public class ProjectViewRequest {
 	public String toString() {
 		return "Requested to get project with name: " + this.projectName;
 	}
-
 }

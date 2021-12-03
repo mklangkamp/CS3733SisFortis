@@ -1,6 +1,7 @@
 package com.amazonaws.lambda.projectViewHandler;
 
 import com.amazonaws.lambda.db.ProjectDAO;
+import com.amazonaws.lambda.db.TaskDAO;
 import com.amazonaws.lambda.http.CreateProjectRequest;
 import com.amazonaws.lambda.http.CreateProjectResponse;
 import com.amazonaws.lambda.http.ProjectViewRequest;
@@ -19,12 +20,14 @@ public class ProjectViewHandler implements RequestHandler<ProjectViewRequest, Pr
 	
 	LambdaLogger logger;
 	
-	ProjectDAO dao;
+	ProjectDAO projectDAO;
+	TaskDAO taskDAO;
 	
     @Override
     public ProjectViewResponse handleRequest(ProjectViewRequest req, Context context) {
     	logger = context.getLogger();
-    	dao = new ProjectDAO(logger);
+    	projectDAO = new ProjectDAO(logger);
+    	taskDAO = new TaskDAO(logger);
     	logger.log("Loading Java Lambda handler of ProjectViewHandler");
 //		logger.log(req.toString());
 		
@@ -34,12 +37,22 @@ public class ProjectViewHandler implements RequestHandler<ProjectViewRequest, Pr
 		
 		Project p = null;
 		
+		
+		//Try to get project from database
 		try {
-			p = dao.getProject(projectName);
+			p = projectDAO.getProject(projectName);
 		}
 		catch(Exception e){
 			System.out.println("Could not find project.");
 		}
+		
+		//MOVED TO ProjectDAO generateProject method.
+		//Try to get tasks associated with that project
+//		try {
+//			p.tasks = taskDAO.getTasksForProject(p);
+//		}catch(Exception e) {
+//			logger.log("Could not find tasks for: " + projectName);
+//		}
 		
 		ProjectViewResponse response = new ProjectViewResponse(p, 200);
 		

@@ -47,7 +47,7 @@ public class AddTaskHandlerTest extends LambdaTest{
     
     @Test 
     public void testAddTask() {
-    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"abc\"},\"task\":{\"name\":\"tempTaskName\", \"id\":\"5.3\", \"status\":false}}";
+    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"abc\"},\"task\":{\"name\":\"tempTaskName\", \"id\":\"5.3.3.3.3\", \"status\":false}}";
     	String RESULT = "tempTaskName";
     	
     	try {
@@ -57,6 +57,18 @@ public class AddTaskHandlerTest extends LambdaTest{
     	}
     }
     
+    
+    @Test 
+    public void testAddTask2() {
+    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"def\"},\"task\":{\"name\":\"tempTaskName\", \"id\":\"5.3.3.3.3\", \"status\":false}}";
+    	String RESULT = "tempTaskName";
+    	
+    	try {
+    		testInput(SAMPLE_INPUT, RESULT);
+    	}catch (IOException ioe) {
+    		Assert.fail("Invalid:" + ioe.getMessage());
+    	}
+    }
     
 //    @Test 
 //    public void testAddTask2() {
