@@ -17,6 +17,14 @@ public class Task {
 //		this.subtasks = subtasks;
 	}
 	
+	public Task(String id, String name, boolean status) {
+		this.id = id;
+		this.name = name;
+//		this.status = status;
+//		this.assignedTeammates = assignedTeammates;
+//		this.subtasks = subtasks;
+	}
+	
 	public Task() {
 		
 	}
