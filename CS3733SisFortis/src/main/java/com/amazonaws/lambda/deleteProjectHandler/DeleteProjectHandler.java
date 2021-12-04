@@ -23,6 +23,8 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.lambda.db.ProjectDAO;
 import com.amazonaws.lambda.http.*;
 import com.amazonaws.lambda.model.Project;
+import com.amazonaws.lambda.model.Task;
+import com.amazonaws.lambda.model.Teammate;
 
 public class DeleteProjectHandler implements RequestHandler<DeleteProjectRequest, DeleteProjectResponse> {
 
@@ -38,7 +40,10 @@ public class DeleteProjectHandler implements RequestHandler<DeleteProjectRequest
 		logger.log(req.toString());
 		
 		String projectName = "";
-		
+//		String taskName = "";
+//		String taskid = "";
+//		String teammateName = "";
+
 		projectName = req.getProjectName();
 		
 		try {

@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.amazonaws.lambda.model.Project;
+import com.amazonaws.lambda.model.Task;
+import com.amazonaws.lambda.model.Teammate;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 
 //import edu.wpi.cs.heineman.demo.model.Constant;
@@ -20,6 +22,8 @@ public class ProjectDAO {
 	TaskDAO taskDAO;
 	
 	final String tblName = "Project";   // Exact capitalization
+	final String tblName2 = "Task";
+	final String tblName3 = "Teammate";
 	LambdaLogger logger;
 
     public ProjectDAO(LambdaLogger logger) {
@@ -73,6 +77,12 @@ public class ProjectDAO {
       	  	logger.log("deleting project");
             PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idProject = ?;");
             ps.setString(1, project.name);
+            PreparedStatement ps2 = conn.prepareStatement("DELETE * FROM " + tblName2 + " WHERE idProject = ?;");
+//            ps2.setString(1, task.id);
+            ps2.setString(2, project.name);
+            PreparedStatement ps3 = conn.prepareStatement("DELETE * FROM " + tblName3 + " WHERE idProject = ?;");
+//            ps3.setString(1, teammate.name);
+            ps3.setString(2, project.name);
             int numAffected = ps.executeUpdate();
             
             return (numAffected == 1);
