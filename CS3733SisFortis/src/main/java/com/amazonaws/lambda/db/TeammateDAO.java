@@ -77,6 +77,30 @@ java.sql.Connection conn;
         }
     }
     
+    public ArrayList<Teammate> getTeammatesForProject(String projectName) throws Exception{
+    	
+    	ArrayList<Teammate> teammates = new ArrayList<Teammate>();
+    	
+    	try {
+	    	logger.log("getting teammates for project: " + projectName);
+	        PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE Project = ?;");
+	        ps.setString(1, projectName);
+	        ResultSet resultSet = ps.executeQuery();
+	        
+	        while (resultSet.next()) {
+	            teammates.add(generateTeammate(resultSet));
+	        }
+	        resultSet.close();
+	        
+//	        logger.log("Teammate1 Name: " + teammates.get(0).name);
+	        
+	        
+    	}catch(Exception e){
+    		throw new Exception("Failed to get teammates: " + e.getMessage());
+    	}
+    	return teammates;
+    }
+    
         private Teammate generateTeammate(ResultSet resultSet) throws Exception {
             String name  = resultSet.getString("idTeammate");
             return new Teammate(name);
