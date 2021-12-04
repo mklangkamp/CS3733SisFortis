@@ -300,6 +300,7 @@
                     teammates = project["teammates"];
                     teammates.forEach(teammate => {
                         str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + t + teammate.name + "</div>";
+                        rowNum = rowNum + 1;
                     })
                 }catch{
                     console.log("Error parsing teammates for project");
@@ -427,6 +428,25 @@
 
 
         function generateProjectViewText(tasks){
+            var str = "";
+            taskNum = 1;
+            try{
+                tasks.forEach(task => {
+                    str =  str + '\n' + "<div name=\"" + taskNum + "\" id=\"" + taskNum + "\">" + task.id + " " + task.name + "</div>";
+                    taskNum = taskNum + 1;
+                });
+            }catch{
+                str = "No tasks exist for this project";
+            }
+            console.log(str);
+            projectViewDisplayData = str;
+
+            // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
+            writeToDisplayBox(str);
+            updateHighlightedRow();
+        }
+
+        function generateTeamViewText(tasks){
             var str = "";
             taskNum = 1;
             try{
