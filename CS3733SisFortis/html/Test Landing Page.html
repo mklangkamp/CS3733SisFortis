@@ -95,6 +95,8 @@
         var projectViewURL = APIURL + "projectView";
         var deleteProjectURL = APIURL + "deleteProject";
         var addTaskURL = APIURL + "addTasks";
+        var addTeammateURL = APIURL + "addTeammate"
+        removeTeammateURL = APIURL + "removeTeammate"
 
         //Variables to allow hiding/unhiding of each webpage
         var LandingPage = true;
@@ -406,6 +408,7 @@
                 project = js["project"];
                 projectName = project["name"];
                 tasks = project["tasks"];
+                teammates = project["teammates"];
             } catch (error) {
                 console.log("Could not find project and tasks in response");
             }
@@ -414,6 +417,7 @@
             //Parse the list of tasks
             try{
                 generateProjectViewText(tasks); //Generate the text, then display the correct one.
+                generateTeamViewText(teammates);
                 if(document.getElementById("ProjectView").hidden){//If project view is hidden then display in the TEAM VIEW
                     writeToDisplayBox(teamViewDisplayData);
                 }
@@ -442,26 +446,26 @@
             projectViewDisplayData = str;
 
             // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
-            writeToDisplayBox(str);
+            // writeToDisplayBox(str);
             updateHighlightedRow();
         }
 
-        function generateTeamViewText(tasks){
+        function generateTeamViewText(teammates){
             var str = "";
-            taskNum = 1;
+            rowNum = 1;
             try{
-                tasks.forEach(task => {
-                    str =  str + '\n' + "<div name=\"" + taskNum + "\" id=\"" + taskNum + "\">" + task.id + " " + task.name + "</div>";
-                    taskNum = taskNum + 1;
+                teammates.forEach(teammate => {
+                    str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + teammate.name + "</div>";
+                    rowNum = rowNum + 1;
                 });
             }catch{
-                str = "No tasks exist for this project";
+                str = "No teammates exist for this project";
             }
             console.log(str);
-            projectViewDisplayData = str;
+            teamViewDisplayData = str;
 
             // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
-            writeToDisplayBox(str);
+            // writeToDisplayBox(str);
             updateHighlightedRow();
         }
 
@@ -599,6 +603,101 @@
             }
 
             
+        }
+
+        function addTeammateButtonPress(){
+            var teammateName = document.getElementById("teammateTextBox").value;
+
+            var projectName = document.testForm.textBox.value;
+
+            var data = {};
+            data["teammateName"] = teammateName;
+            data["projectName"] = projectName;
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", addTeammateURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            document.getElementById("TeamViewNotification").innerHTML = "Working on adding teammate...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processAddTeammateResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processAddTeammateResponse("N/A");
+                }
+            };
+        }
+
+        function processAddTeammateResponse(result){
+            var js = JSON.parse(result);
+            errorMsg = js["error"];
+            
+            //If teammate didnt already exist, add them, otherwise display error to screen
+            if(errorMsg == ""){
+                document.getElementById("TeamViewNotification").innerHTML = "Successfully added teammate.";
+                openProject();
+            }else{
+                document.getElementById("TeamViewNotification").innerHTML = errorMsg;
+            }
+        }
+
+
+
+        function removeTeammateButtonPress(){
+            console.log("Removing Teammate");
+            var teammateName = document.getElementById(highlightedRow).innerHTML;
+
+            //Remove tabs here if necessary
+
+            var data = {};
+            data["teammateName"] = teammateName;
+            data["projectName"] = projectName;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", removeTeammateURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            document.getElementById("TeamViewNotification").innerHTML = "Working on removing teammate...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processRemoveTeammateResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processRemoveTeammateResponse("N/A");
+                }
+            };
+        }
+
+        //Print the created project name to screen
+        function processRemoveTeammateResponse(result){
+            openProject();
+            document.getElementById("TeamViewNotification").innerHTML = "Successfully removed teammate...";
         }
 
         
@@ -770,8 +869,8 @@
 
 
                 <br style="line-height: 80px;">
-                <form name="TextBoxForm" method="post">
-                    <input type="text" value="" class="textBox" id="textBox">
+                <form name="TeammateTextBoxForm" method="post">
+                    <input type="text" value="" class="textBox" id="teammateTextBox">
                 </form>
                 
                 
@@ -791,7 +890,7 @@
                 </form>
 
                 <br style="line-height: 80px;">
-                <p id="testP" onload="JavaScript:onLoadFunction"></p>
+                <p id="TeamViewNotification"></p>
 
             </div>
         </div>
