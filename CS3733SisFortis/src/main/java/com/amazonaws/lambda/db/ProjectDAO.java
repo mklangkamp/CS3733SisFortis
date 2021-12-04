@@ -18,12 +18,14 @@ public class ProjectDAO {
 
 	java.sql.Connection conn;
 	TaskDAO taskDAO;
+	TeammateDAO teammateDAO;
 	
 	final String tblName = "Project";   // Exact capitalization
 	LambdaLogger logger;
 
     public ProjectDAO(LambdaLogger logger) {
     	taskDAO = new TaskDAO(logger);
+    	teammateDAO = new TeammateDAO(logger);
     	this.logger = logger;
     	try  {
     		logger.log("Trying to connect to database");
@@ -94,6 +96,12 @@ public class ProjectDAO {
 		}catch(Exception e) {
 			logger.log("Could not find tasks for: " + name);
 		}
+      
+      try {
+    	  p.teammates = teammateDAO.getTeammatesForProject(name);
+      }catch(Exception e){
+    	  logger.log("Could not find teammates for: " + name);
+      }
       
       return p;
   }
