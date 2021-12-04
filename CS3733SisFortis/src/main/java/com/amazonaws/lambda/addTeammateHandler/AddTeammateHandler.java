@@ -40,15 +40,24 @@ public class AddTeammateHandler implements RequestHandler<AddTeammateRequest, Ad
 		logger.log(req.toString());
 		
 		
-		
+		boolean successfullyAdded = false;
 		try {
-			dao.addTeammate(req.projectName, req.teammateName);
+			successfullyAdded = dao.addTeammate(req.projectName, req.teammateName);
 		}
 		catch(Exception e){
+			
 			System.out.println("Could not add teammate.");
 		}
 		
-		AddTeammateResponse response = new AddTeammateResponse(req.teammateName, 200);
+		
+		AddTeammateResponse response = new AddTeammateResponse();
+		
+		if(successfullyAdded) {
+			response = new AddTeammateResponse(req.teammateName, 200);
+		}else {
+			logger.log("Teammate " + req.teammateName + " already exists in project.");
+			response = new AddTeammateResponse(200, "Teammate " + req.teammateName + " already exists in project.");
+		}
 		
 		return response;
     }

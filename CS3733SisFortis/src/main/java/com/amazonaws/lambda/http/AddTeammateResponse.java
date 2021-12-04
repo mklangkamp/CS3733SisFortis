@@ -19,6 +19,8 @@ public class AddTeammateResponse {
 		this.teammateName = teammateName;
 	}
 	
+	public AddTeammateResponse() {};
+	
 	public String toString() {
 		return "teammateName(" + this.teammateName + ")";
 	}

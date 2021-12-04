@@ -39,6 +39,7 @@ public class AddTeammateHandlerTest extends LambdaTest{
     	
     	AddTeammateResponse response = handler.handleRequest(req, createContext("Add Teammate"));
 		
+    	
 		
 		Assert.assertEquals(outgoing, response.teammateName);
         Assert.assertEquals(200, response.statusCode);
