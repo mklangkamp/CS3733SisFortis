@@ -307,10 +307,6 @@
                 }catch{
                     console.log("Error parsing teammates for project");
                 }
-                
-
-
-                
             });
         
             // str = "No Projects Stored in Database"
@@ -413,7 +409,7 @@
                 console.log("Could not find project and tasks in response");
             }
 
-            console.log(document.getElementById("ProjectView").hidden)
+            // console.log(document.getElementById("ProjectView").hidden)
             //Parse the list of tasks
             try{
                 generateProjectViewText(tasks); //Generate the text, then display the correct one.
@@ -427,7 +423,25 @@
             }catch{
                 console.log("Could not parse tasks");
             }
+
+            try{
+                updateTeammateSelectOptions(teammates);
+            }catch{
+                console.log("Could not update teammate dropdown.")
+            }
+
             updateHighlightedRow();
+        }
+
+        function updateTeammateSelectOptions(teammates){
+            // <option value="volvo">Volvo</option>
+            var str = "";
+            teammates.forEach(teammate => {
+                // console.log(teammate.name);
+                str = str + '\n' + "<option value=\"" + teammate.name + "\">" + teammate.name + "</option>";
+                // console.log(str);
+            });
+            document.getElementById("ProjectViewTeammateInput").innerHTML = str;
         }
 
 
@@ -442,7 +456,7 @@
             }catch{
                 str = "No tasks exist for this project";
             }
-            console.log(str);
+            // console.log(str);
             projectViewDisplayData = str;
 
             // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
@@ -461,7 +475,7 @@
             }catch{
                 str = "No teammates exist for this project";
             }
-            console.log(str);
+            // console.log(str);
             teamViewDisplayData = str;
 
             // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
@@ -972,7 +986,15 @@
                 
                 
                 <form name="TextBoxForm" method="post">
-                    <input type="text" value="" class="textBox" id="ProjectViewTeammateInput">
+                    <!-- <input type="text" value="" class="textBox" id="ProjectViewTeammateInput"> -->
+                    <select name="ProjectViewTeammateInput" id="ProjectViewTeammateInput">
+                        <!-- Use document.getElementById("ProjectViewTeammateInput").value to get selected value. -->
+                        <!-- <option value="volvo">Volvo</option>
+                        <option value="saab">Saab</option>
+                        <option value="mercedes">Mercedes</option>
+                        <option value="audi">Audi</option> -->
+                    </select>
+
                 </form>
                 
                 
