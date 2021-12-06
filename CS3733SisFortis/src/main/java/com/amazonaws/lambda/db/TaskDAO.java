@@ -80,6 +80,22 @@ java.sql.Connection conn;
         }
     }
     
+    
+    public boolean removeTasksOnProject(String projectName) throws Exception {
+        try {
+      	  //System.out.println("adding project");
+      	  	logger.log("removing tasks");
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE Project = ?;");
+            ps.setString(1, projectName);
+            int numAffected = ps.executeUpdate();
+            logger.log("numAffected: " + numAffected);
+            return (numAffected == 1);
+        } catch (Exception e) {
+            throw new Exception("Failed to delete: " + e.getMessage());
+        }
+    }
+    
+    
         private Task generateTask(ResultSet resultSet) throws Exception {
             String id  = resultSet.getString("idTask");
             String name = resultSet.getString("Name");
