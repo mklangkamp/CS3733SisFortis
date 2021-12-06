@@ -21,6 +21,8 @@ import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.lambda.db.ProjectDAO;
+import com.amazonaws.lambda.db.TaskDAO;
+import com.amazonaws.lambda.db.TeammateDAO;
 import com.amazonaws.lambda.http.*;
 import com.amazonaws.lambda.model.Project;
 
@@ -28,12 +30,16 @@ public class DeleteProjectHandler implements RequestHandler<DeleteProjectRequest
 
 	LambdaLogger logger;
 	
-	ProjectDAO dao;
+	ProjectDAO projectDAO;
+	TaskDAO taskDAO;
+	TeammateDAO teammateDAO;
 	
     @Override
     public DeleteProjectResponse handleRequest(DeleteProjectRequest req, Context context) {
     	logger = context.getLogger();
-    	dao = new ProjectDAO(logger);
+    	projectDAO = new ProjectDAO(logger);
+    	taskDAO = new TaskDAO(logger);
+    	teammateDAO = new TeammateDAO(logger);
     	logger.log("Loading Java Lambda handler of DeleteProjectHandler");
 		logger.log(req.toString());
 		
@@ -42,7 +48,9 @@ public class DeleteProjectHandler implements RequestHandler<DeleteProjectRequest
 		projectName = req.getProjectName();
 		
 		try {
-			dao.deleteProject(new Project(projectName));
+			logger.log("Attempting to delete project: " + projectName);
+			projectDAO.deleteProject(new Project(projectName));
+			logger.log("Successfully deleted " + projectName);
 		}
 		catch(Exception e){
 			System.out.println("Could not delete project.");
