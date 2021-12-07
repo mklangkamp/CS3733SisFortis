@@ -113,6 +113,24 @@ java.sql.Connection conn;
                 return false; //IF the taskID and the project name are already in the project, dont insert it.
             }
             
+            logger.log("checking for parent to be in same project");
+            ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE Name = ? AND Project = ?;");
+            ps.setString(1,  task.parentName);
+            ps.setString(2,  project.name);
+            logger.log("Before second resultSet");
+            resultSet = ps.executeQuery();
+            logger.log("After second resultSet");
+            
+            if (resultSet.next()) {
+            	logger.log("in the second while loop");
+                resultSet.close();
+                logger.log("Parent Task exists.");
+                // pass through
+            }
+            else {
+            	return false; //IF the parent does not exist, do not insert
+            }
+            
             logger.log("Before the preparedStatement");
             ps = conn.prepareStatement("INSERT INTO " + tblName + " (idTask,Name,Status,ParentTask,Project) values(?,?,?,?,?);");
             logger.log("After the preparedStatement");
@@ -134,6 +152,47 @@ java.sql.Connection conn;
             throw new Exception("Failed to add: " + e.getMessage());
         }
     }
+    
+    
+//    public boolean addSubtask(Project project, Task task) throws Exception {
+//        try {
+//      	  logger.log("adding subtask");
+//            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? AND Project = ? AND ParentTask = ?;");
+//            ps.setString(1, task.id);
+//            ps.setString(2, project.name);
+//            ps.setString(3, task.parentName);
+//            logger.log("Before the resultSet");
+//            ResultSet resultSet = ps.executeQuery();
+//            logger.log("After the resultSet");
+//            
+//            while (resultSet.next()) {
+//            	logger.log("in the while loop");
+//                resultSet.close();
+//                logger.log("Task already exists, could not add.");
+//                return false; //IF the taskID and the project name are already in the project, dont insert it.
+//            }
+//            
+//            logger.log("Before the preparedStatement");
+//            ps = conn.prepareStatement("INSERT INTO " + tblName + " (idTask,Name,Status,ParentTask,Project) values(?,?,?,?,?);");
+//            logger.log("After the preparedStatement");
+//            
+//            ps.setString(1, task.id);
+//            ps.setString(2, task.name);
+//            ps.setBoolean(3, task.status);
+//            // if this is a subtask, this should not be null (null for top level tasks only, iteration #2)
+//            //ps.setString(4, null);
+//            logger.log("Before setting parentName");
+//            ps.setString(4, task.parentName);
+//            logger.log("After setting parentName");
+//            ps.setString(5, project.name);
+//            logger.log("Before the execute");
+//            ps.execute();
+//            return true;
+//
+//        } catch (Exception e) {
+//            throw new Exception("Failed to add: " + e.getMessage());
+//        }
+//    }
     
     
         private Task generateTask(ResultSet resultSet) throws Exception {
