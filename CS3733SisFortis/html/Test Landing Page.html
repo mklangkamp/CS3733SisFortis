@@ -430,14 +430,33 @@
             updateHighlightedRow();
         }
 
+        function generateTaskString(task, rowNum, tab){
+            var str = "";
+            str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "</div>";
+            return str;
+        }
+
+        
+
+
 
         function generateProjectViewText(tasks){
             var str = "";
-            taskNum = 1;
+            rowNum = 1;
             try{
                 tasks.forEach(task => {
-                    str =  str + '\n' + "<div name=\"" + taskNum + "\" id=\"" + taskNum + "\">" + task.id + " " + task.name + "</div>";
-                    taskNum = taskNum + 1;
+                    str = str + generateTaskString(task, rowNum,"");
+                    rowNum = rowNum + 1;
+                    
+                    var assignees = task["assignees"]
+                    if (assignees != undefined){
+                        assignees.forEach (assignee => {
+                            str = str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + assignee + "</div>";
+                            rowNum = rowNum +1;
+                        });  
+                    }
+                    
+
                 });
             }catch{
                 str = "No tasks exist for this project";
@@ -453,11 +472,20 @@
         function generateTeamViewText(teammates){
             var str = "";
             rowNum = 1;
+            var tab = "&emsp;&emsp;";
             try{
                 teammates.forEach(teammate => {
                     str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + teammate.name + "</div>";
-                    rowNum = rowNum + 1;
-                });
+                    rowNum = rowNum + 1
+                    
+                    var tasks = teammate["tasks"]
+                    if (tasks != undefined){
+                        tasks.forEach (task => {
+                            str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "</div>";
+                            rowNum = rowNum +1;
+                        });
+                    }
+                });    
             }catch{
                 str = "No teammates exist for this project";
             }
