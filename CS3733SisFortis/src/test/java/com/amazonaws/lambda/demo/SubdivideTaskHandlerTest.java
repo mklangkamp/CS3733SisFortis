@@ -50,7 +50,7 @@ public class SubdivideTaskHandlerTest extends LambdaTest{
     
     @Test 
     public void testSubdivideTask() {
-    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"abc\"},\"task\":{\"name\":\"testSubtask\", \"id\":\"5.3.3\", \"status\":false, \"parentName\":\"1\"}}";
+    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"abc\"},\"task\":{\"name\":\"testing\", \"id\":\"5.3\", \"status\":false, \"idParent\":\"1\"}}";
     	String RESULT = "testSubtask";
     	
     	try {

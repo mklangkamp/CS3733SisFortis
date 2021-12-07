@@ -5,15 +5,15 @@ import java.util.ArrayList;
 public class Task {
 	public String id;
 	public String name;
-	public String parentName;
+	public String idParent;
 	public boolean status;
 	public ArrayList<Teammate> assignedTeammates;
 	public ArrayList<Task> subtasks;
 	
-	public Task(String id, String name, String parentName, boolean status) {
+	public Task(String id, String name, boolean status, String idParent) {
 		this.id = id;
 		this.name = name;
-		this.parentName = parentName;
+		this.idParent = idParent;
 		this.status = status;
 //		this.assignedTeammates = assignedTeammates;
 //		this.subtasks = subtasks;

@@ -11,7 +11,7 @@ public class SubdivideTaskRequest {
 	
 	public String getTaskName() {return this.task.name;}
 	public String getProjectName() {return this.project.name;}
-	public String getParentTaskName() {return this.task.parentName;}
+	public String getParentTaskName() {return this.task.idParent;}
 	
 	public SubdivideTaskRequest(Project project, Task task) {
 		this.project = project;
