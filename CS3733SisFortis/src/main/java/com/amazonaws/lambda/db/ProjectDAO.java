@@ -72,6 +72,15 @@ public class ProjectDAO {
     public boolean deleteProject(Project project) throws Exception {
         try {
       	  //System.out.println("adding project");
+        	logger.log("Attempting to delete all teammates for project: " + project.name);
+			teammateDAO.removeTeammatesOnProject(project.name);
+			logger.log("Successfully deleted all teamamtess");
+			
+			
+			logger.log("Attempting to delete all tasks for project: " + project.name);
+			taskDAO.removeTasksOnProject(project.name);
+			logger.log("Successfully deleted all tasks");
+        	
       	  	logger.log("deleting project");
             PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idProject = ?;");
             ps.setString(1, project.name);
