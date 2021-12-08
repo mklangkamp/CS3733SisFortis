@@ -159,19 +159,28 @@
 
         //Unhighlights previously selected row, and highlights newly selected row. 
         function updateHighlightedRow(){
+            try{
+                document.getElementById(lastHighlightedRow).innerHTML
+                document.getElementById(highlightedRow).innerHTML
+            }catch{
+                highlightedRow = 1;
+                lastHighlightedRow = 1;
+            }
             document.getElementsByName(lastHighlightedRow).forEach(e => e.style.backgroundColor = "white");
             document.getElementsByName(highlightedRow).forEach(e => e.style.backgroundColor = "yellow");
 
-            //Set the mark task button to unmark task when needed
-            console.log(highlightedRow)
-            var highlightedRowText = document.getElementById(highlightedRow).innerHTML;
-            console.log(highlightedRowText)
-            if(highlightedRowText.indexOf(checkMark) == -1){
-                document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Complete"                
-            }else{
-                document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Incomplete"
+            try{
+                //Set the mark task button to unmark task when needed
+                var highlightedRowText = document.getElementById(highlightedRow).innerHTML;
+                
+                if(highlightedRowText.indexOf(checkMark) == -1){
+                    document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Complete"                
+                }else{
+                    document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Incomplete"
+                }
+            }catch{
+                
             }
-
 
 
         }
@@ -179,6 +188,7 @@
         function writeToDisplayBox(str){
             var elements = document.getElementsByName("AdminProjectDisplayBox");
             elements.forEach(element => element.innerHTML = str);
+            updateHighlightedRow();
         }
 
         //ADMIN PAGE FUNCTIONS ---------------------------------------------------------
@@ -199,6 +209,7 @@
         function deleteProject(){
             console.log("Deleting project");
             var projectName = document.getElementById(highlightedRow).innerHTML;
+            projectName = projectName.substring(0,projectName.lastIndexOf(" "));
             // projectName = projectName.substr(projectName.indexOf(" "));
 
 
@@ -242,10 +253,10 @@
                 document.getElementById("AdminPageNotification").innerHTML = "Successfully deleted project: " + js["projectName"];
                 highlightedRow = 1;
                 lastHighlightedRow = 1;
-                updateHighlightedRow();
             }else{
                 document.getElementById("AdminPageNotification").innerHTML = "Could not delete project";
             }
+            
         }
         
 
@@ -294,6 +305,7 @@
                 }else{
                     processListProjectsResponse("N/A");
                 }
+                updateHighlightedRow();
             };
         }
 
@@ -316,7 +328,30 @@
             // tasks = project["tasks"];
 
             projectList.forEach(project => {
-                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + project.name + "</div>";
+                
+                //Determine status metricics for the tasks in the project.
+                try{
+                    tasks = project["tasks"];
+                    var numTasks = 0;
+                    var numTasksComplete = 0;
+                    tasks.forEach(task =>{
+                        if(task.status){
+                            numTasksComplete++;
+                        }
+                        numTasks++;
+                    })
+                }catch{
+                    console.log("No tasks for this project")
+                }
+                if(numTasks != 0){
+                    statusMetric = ((numTasksComplete/numTasks)*100).toFixed(); //toFixed(numDecimals) sets value to zero decmial places
+                }else{
+                    statusMetric = 0;
+                }
+
+
+                //Create display string for projects
+                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + project.name + " " + statusMetric +"%</div>";
                 rowNum = rowNum + 1;
 
                 try{
@@ -450,8 +485,6 @@
             }catch{
                 console.log("Could not update teammate dropdown.")
             }
-
-            updateHighlightedRow();
         }
 
 
@@ -670,11 +703,13 @@
 
             //Remove the id # and checkmark from the task name
             var taskName = document.getElementById(highlightedRow).innerHTML;
-            
+            var markingComplete = true;
+
             if(taskName.indexOf(checkMark) == -1){
                 taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-1);
             }else{
                 taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-2);
+                markingComplete = false;
             }
             
 
@@ -688,8 +723,11 @@
             var xhr = new XMLHttpRequest();
             xhr.open("POST", markTaskCompletedURL, true);
 
-
-            document.getElementById("ProjectViewNotification").innerHTML = "Marking task: " + taskName + " as complete";
+            if(markingComplete){
+                document.getElementById("ProjectViewNotification").innerHTML = "Marking task: " + taskName + " as complete";
+            }else{
+                document.getElementById("ProjectViewNotification").innerHTML = "Marking task: " + taskName + " as incomplete";    
+            }
 
             //Send the data as JSON
             xhr.send(js);
