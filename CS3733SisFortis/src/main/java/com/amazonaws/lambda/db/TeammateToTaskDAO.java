@@ -37,9 +37,10 @@ java.sql.Connection conn;
     public boolean assignTeammate(String idTask, String teammateName, String idProject) throws Exception {
         try {
       	  logger.log("assigning teammate to task");
-            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? AND idTeammate = ?;");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? AND idTeammate = ? AND idProject =?;");
             ps.setString(1, idTask);
             ps.setString(2, teammateName);
+            ps.setNString(3, idProject);
 //            logger.log(idProject);
             ResultSet resultSet = ps.executeQuery();
 //            ps.close();
@@ -105,7 +106,7 @@ java.sql.Connection conn;
         }
     }
     
-    public ArrayList<String> getAllTaskTeammates(String idTask, String projectName) throws Exception {
+    public ArrayList<String> getAllTaskTeammates(String idTask, String idProject) throws Exception {
         
 	      ArrayList<String> allTaskTeammates = new ArrayList<>();
 	    	
@@ -113,7 +114,7 @@ java.sql.Connection conn;
 		    	logger.log("getting teammate for task: " + idTask);
 		        PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? and idProject = ?;");
 		        ps.setString(1, idTask);
-		        ps.setString(2, projectName);
+		        ps.setString(2, idProject);
 		        ResultSet resultSet = ps.executeQuery();
 		        
 		        while (resultSet.next()) {
@@ -130,7 +131,7 @@ java.sql.Connection conn;
 	    	return allTaskTeammates;
 }
     
-    public ArrayList<Task> getAllTeammateTasks(String teammateName) throws Exception {
+    public ArrayList<Task> getAllTeammateTasks(String teammateName, String idProject) throws Exception {
         
 	      ArrayList<Task> allTeammateTasks = new ArrayList<>();
 	    	
@@ -139,6 +140,7 @@ java.sql.Connection conn;
 		        PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + "," + tblName2 + "WHERE idTeammate = ? AND" + tblName2 + ".idTask =" + tblName + ".idTask AND" 
 		    	+ tblName2 + ".Project =" + tblName + ".idProject;");
 		        ps.setString(1, teammateName);
+		        ps.setString(2, idProject);
 		        ResultSet resultSet = ps.executeQuery();
 		        
 		        while (resultSet.next()) {
