@@ -159,19 +159,28 @@
 
         //Unhighlights previously selected row, and highlights newly selected row. 
         function updateHighlightedRow(){
+            try{
+                document.getElementById(lastHighlightedRow).innerHTML
+                document.getElementById(highlightedRow).innerHTML
+            }catch{
+                highlightedRow = 1;
+                lastHighlightedRow = 1;
+            }
             document.getElementsByName(lastHighlightedRow).forEach(e => e.style.backgroundColor = "white");
             document.getElementsByName(highlightedRow).forEach(e => e.style.backgroundColor = "yellow");
 
-            //Set the mark task button to unmark task when needed
-            // console.log(highlightedRow)
-            var highlightedRowText = document.getElementById(highlightedRow).innerHTML;
-            // console.log(highlightedRowText)
-            if(highlightedRowText.indexOf(checkMark) == -1){
-                document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Complete"                
-            }else{
-                document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Incomplete"
+            try{
+                //Set the mark task button to unmark task when needed
+                var highlightedRowText = document.getElementById(highlightedRow).innerHTML;
+                
+                if(highlightedRowText.indexOf(checkMark) == -1){
+                    document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Complete"                
+                }else{
+                    document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Incomplete"
+                }
+            }catch{
+                
             }
-
 
 
         }
@@ -179,6 +188,7 @@
         function writeToDisplayBox(str){
             var elements = document.getElementsByName("AdminProjectDisplayBox");
             elements.forEach(element => element.innerHTML = str);
+            updateHighlightedRow();
         }
 
         //ADMIN PAGE FUNCTIONS ---------------------------------------------------------
@@ -199,6 +209,7 @@
         function deleteProject(){
             console.log("Deleting project");
             var projectName = document.getElementById(highlightedRow).innerHTML;
+            projectName = projectName.substring(0,projectName.lastIndexOf(" "));
             // projectName = projectName.substr(projectName.indexOf(" "));
 
 
@@ -242,10 +253,10 @@
                 document.getElementById("AdminPageNotification").innerHTML = "Successfully deleted project: " + js["projectName"];
                 highlightedRow = 1;
                 lastHighlightedRow = 1;
-                updateHighlightedRow();
             }else{
                 document.getElementById("AdminPageNotification").innerHTML = "Could not delete project";
             }
+            
         }
         
 
@@ -294,6 +305,7 @@
                 }else{
                     processListProjectsResponse("N/A");
                 }
+                updateHighlightedRow();
             };
         }
 
@@ -473,8 +485,6 @@
             }catch{
                 console.log("Could not update teammate dropdown.")
             }
-
-            updateHighlightedRow();
         }
 
 
