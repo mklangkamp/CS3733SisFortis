@@ -14,6 +14,9 @@ public class TaskDAO {
 java.sql.Connection conn;
 	
 	final String tblName = "Task";   // Exact capitalization
+	final String tblName2 = "TeammateToTask";   // Exact capitalization
+	
+	TeammateDAO teammateDAO;
 	LambdaLogger logger;
 
     public TaskDAO(LambdaLogger logger) {
@@ -125,7 +128,7 @@ java.sql.Connection conn;
             
             if (resultSet.next()) {
 //            	logger.log("in the second while loop");
-            	Task t = generateTask(resultSet);
+//            	Task t = generateTask(resultSet);
                 resultSet.close();
                 logger.log("Parent Task exists.");
                 ps.close();
@@ -160,6 +163,7 @@ java.sql.Connection conn;
             throw new Exception("Failed to add: " + e.getMessage());
         }
     }
+    
     
     
 //    public boolean addSubtask(Project project, Task task) throws Exception {
@@ -203,10 +207,11 @@ java.sql.Connection conn;
 //    }
     
     
-        private Task generateTask(ResultSet resultSet) throws Exception {
+        public Task generateTask(ResultSet resultSet) throws Exception {
             String id  = resultSet.getString("idTask");
             String name = resultSet.getString("Name");
             Boolean status = resultSet.getBoolean("Status");
+            String idParent = resultSet.getString("idParent");
             return new Task (id, name, status);
         }
         
