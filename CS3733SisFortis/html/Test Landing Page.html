@@ -1,3 +1,7 @@
+
+<!-- //#1: when highlighted row has a checkmark, the button says "unmark complete" and vice versa
+     //#2: modify the lambda to make it so that it pulls the task from the table, determines its status, and marks it the opposite. -->
+
 <html>
     <style>
         body{
@@ -157,6 +161,19 @@
         function updateHighlightedRow(){
             document.getElementsByName(lastHighlightedRow).forEach(e => e.style.backgroundColor = "white");
             document.getElementsByName(highlightedRow).forEach(e => e.style.backgroundColor = "yellow");
+
+            //Set the mark task button to unmark task when needed
+            console.log(highlightedRow)
+            var highlightedRowText = document.getElementById(highlightedRow).innerHTML;
+            console.log(highlightedRowText)
+            if(highlightedRowText.indexOf(checkMark) == -1){
+                document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Complete"                
+            }else{
+                document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Incomplete"
+            }
+
+
+
         }
 
         function writeToDisplayBox(str){
@@ -491,7 +508,7 @@
 
             // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
             // writeToDisplayBox(str);
-            updateHighlightedRow();
+            // updateHighlightedRow();
         }
 
         function generateTeamViewText(teammates){
@@ -519,7 +536,7 @@
 
             // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
             // writeToDisplayBox(str);
-            updateHighlightedRow();
+            // updateHighlightedRow();
         }
 
         
@@ -643,15 +660,22 @@
         }
 
 
+        
+
 
         // Handler for marking a task as complete
         function MarkSelectedTaskButtonPress(){
             var form = document.testForm;
             var textVal = form.textBox.value;
 
-            //Remove the id # from the task name
+            //Remove the id # and checkmark from the task name
             var taskName = document.getElementById(highlightedRow).innerHTML;
-            taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-1);
+            
+            if(taskName.indexOf(checkMark) == -1){
+                taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-1);
+            }else{
+                taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-2);
+            }
             
 
             var data = {};
@@ -691,11 +715,20 @@
             console.log("result:" + result);
             var js = JSON.parse(result);
             
+            //If the task did not have the checkmark before being marked, it is marked as complete. Otherwise marked as incomplete.
+            var taskName = document.getElementById(highlightedRow).innerHTML;
+            
+            if(taskName.indexOf(checkMark) == -1){
+                taskStatus = "complete";
+            }else{
+                taskStatus = "incomplete"
+            }
+
             if(result == "N/A"){
-                document.getElementById("ProjectViewNotification").innerHTML = "Could not mark task: " + js.taskName + " as complete";
+                document.getElementById("ProjectViewNotification").innerHTML = "Could not change task marking for: " + js.taskName;
                 return;
             }
-            document.getElementById("ProjectViewNotification").innerHTML = "Marked task: " + js.taskName + " as complete";
+            document.getElementById("ProjectViewNotification").innerHTML = "Marked task: " + js.taskName + " as " + taskStatus;
             openProject();
         }
 
