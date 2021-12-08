@@ -96,7 +96,8 @@
         var deleteProjectURL = APIURL + "deleteProject";
         var addTaskURL = APIURL + "addTasks";
         var addTeammateURL = APIURL + "addTeammate"
-        removeTeammateURL = APIURL + "removeTeammate"
+        var removeTeammateURL = APIURL + "removeTeammate"
+        var markTaskCompletedURL = APIURL + "markTask"
 
         //Variables to allow hiding/unhiding of each webpage
         var LandingPage = true;
@@ -110,6 +111,9 @@
         //Vars to keep display data for project stored so it doesnt need to be regenerated each time user switches between project view and team view.
         var teamViewDisplayData = "teamViewPlaceHolderData";
         var projectViewDisplayData = "projectViewPlaceHolderData";
+
+
+        var checkMark = "✅";
 
 
         //GENERAL USE FUNCTIONS ---------------------------------------------------------
@@ -436,7 +440,11 @@
 
         function generateTaskString(task, rowNum, tab){
             var str = "";
-            str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "</div>";
+            if(task.status == false){
+                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name +"&emsp;" +  "</div>";
+            }else{
+                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "&emsp;" + checkMark + "</div>";
+            }
             return str;
         }
 
@@ -632,6 +640,63 @@
                     processAddTaskResponse("N/A");
                 }
             };
+        }
+
+
+
+        // Handler for marking a task as complete
+        function MarkSelectedTaskButtonPress(){
+            var form = document.testForm;
+            var textVal = form.textBox.value;
+
+            //Remove the id # from the task name
+            var taskName = document.getElementById(highlightedRow).innerHTML;
+            taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-1);
+            
+
+            var data = {};
+            data["projectName"] = textVal;
+            data["taskName"] = taskName;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", markTaskCompletedURL, true);
+
+
+            document.getElementById("ProjectViewNotification").innerHTML = "Marking task: " + taskName + " as complete";
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processMarkTaskCompleteResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processMarkTaskCompleteResponse("N/A");
+                }
+            };
+        }
+
+        function processMarkTaskCompleteResponse(result){
+            console.log("result:" + result);
+            var js = JSON.parse(result);
+            
+            if(result == "N/A"){
+                document.getElementById("ProjectViewNotification").innerHTML = "Could not mark task: " + js.taskName + " as complete";
+                return;
+            }
+            document.getElementById("ProjectViewNotification").innerHTML = "Marked task: " + js.taskName + " as complete";
+            openProject();
         }
 
 
