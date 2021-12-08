@@ -20,7 +20,7 @@ public class Task {
 	public Task(String id, String name, boolean status) {
 		this.id = id;
 		this.name = name;
-//		this.status = status;
+		this.status = status;
 //		this.assignedTeammates = assignedTeammates;
 //		this.subtasks = subtasks;
 	}

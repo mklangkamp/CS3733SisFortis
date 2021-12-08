@@ -103,4 +103,20 @@ java.sql.Connection conn;
             return new Task (id, name, status);
         }
         
+        public boolean markTaskComplete(String projectName, String taskName) throws Exception{
+        	try {
+        		logger.log("Marking Task Complete");
+        		PreparedStatement ps = conn.prepareStatement("UPDATE " + tblName + " SET Status=? WHERE (Name,Project) = (?,?);");
+        		ps.setBoolean(1,true);
+        		ps.setString(2, taskName);
+        		ps.setString(3, projectName);
+        		logger.log("Executing SQL Command");
+                int numAffected = ps.executeUpdate();
+                logger.log("numAffected: " + numAffected);
+                return (numAffected == 1);
+        	}catch(Exception e) {
+        		throw new Exception("Failed to mark task as complete");
+        	}
+        }
+        
 }
