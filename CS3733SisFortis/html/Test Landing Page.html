@@ -460,6 +460,7 @@
         function generateProjectViewText(tasks){
             var str = "";
             rowNum = 1;
+            var tab = "&emsp;&emsp;";
             try{
                 tasks.forEach(task => {
                     str = str + generateTaskString(task, rowNum,"");
@@ -468,11 +469,10 @@
                     var assignees = task["assignees"]
                     if (assignees != undefined){
                         assignees.forEach (assignee => {
-                            str = str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + assignee + "</div>";
+                            str = str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + assignee + "</div>";
                             rowNum = rowNum +1;
                         });  
                     }
-                    
 
                 });
             }catch{
