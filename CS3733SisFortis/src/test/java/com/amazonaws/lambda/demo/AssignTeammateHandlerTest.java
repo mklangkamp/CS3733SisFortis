@@ -60,6 +60,18 @@ public class AssignTeammateHandlerTest extends LambdaTest{
     	}
     }
     
+    @Test 
+    public void testAssignTeammate2() {
+    	String SAMPLE_INPUT = "{\"idTask\": \"1\", \"teammateName\": \"Jim\", \"idProject\": \"NewTestProject\"}";
+    	String RESULT = "Jim";
+    	
+    	try {
+    		testInput(SAMPLE_INPUT, RESULT);
+    	}catch (IOException ioe) {
+    		Assert.fail("Invalid:" + ioe.getMessage());
+    	}
+    }
+    
     
 //    @Test 
 //    public void testAddTask2() {

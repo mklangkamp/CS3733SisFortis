@@ -211,8 +211,17 @@ java.sql.Connection conn;
             String id  = resultSet.getString("idTask");
             String name = resultSet.getString("Name");
             Boolean status = resultSet.getBoolean("Status");
-            String idParent = resultSet.getString("idParent");
-            return new Task (id, name, status);
+            String idParent;
+            try {
+            	 idParent = resultSet.getString("idParent");
+            }
+           catch(Exception e) {
+        	   idParent = "";
+           }
+            String idProject = resultSet.getString("idProject");
+            Task t =  new Task(id, name, status, idParent, idProject);
+            ArrayList<String> assignedTeammates = t.getAssignedTeammates(id, idProject);
+            return new Task (id, name, status, assignedTeammates);
         }
         
 }

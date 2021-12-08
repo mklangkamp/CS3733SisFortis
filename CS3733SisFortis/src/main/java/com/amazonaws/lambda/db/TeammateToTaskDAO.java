@@ -53,9 +53,9 @@ java.sql.Connection conn;
             
             ps = conn.prepareStatement("SELECT * FROM " + tblName2 + " WHERE idTask = ? AND Project = ?;");
             ps.setString(1, idTask);
-            logger.log(idTask);
+//            logger.log(idTask);
             ps.setString(2, idProject);
-            logger.log(idProject);
+//            logger.log(idProject);
             resultSet = ps.executeQuery();
             
             if (resultSet.next()) {
@@ -96,8 +96,11 @@ java.sql.Connection conn;
             ps = conn.prepareStatement("INSERT INTO " + tblName + " (idTask,idTeammate,idProject) values(?,?,?);");
             
             ps.setString(1, idTask);
+//            logger.log(idTask);
             ps.setString(2, teammateName);
+//            logger.log(teammateName);
             ps.setString(3, idProject);
+//            logger.log(idProject);
             ps.execute();
             return true;
 

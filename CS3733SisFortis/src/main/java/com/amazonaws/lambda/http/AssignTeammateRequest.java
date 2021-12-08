@@ -17,7 +17,7 @@ public class AssignTeammateRequest {
 	public AssignTeammateRequest(String idTask, String teammateName, String idProject) {
 		this.idTask = idTask;
 		this.teammateName = teammateName;
-		this.idProject =idProject;
+		this.idProject = idProject;
 	}
 	
 	public AssignTeammateRequest() {
