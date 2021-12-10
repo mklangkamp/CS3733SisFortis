@@ -14,6 +14,10 @@ public class Project {
 		this.archived = false;
 	}
 	
+	public Project(String name, boolean archived) {
+		this.name = name;
+		this.archived = archived;
+	}
 	public Project() {
 		
 	}

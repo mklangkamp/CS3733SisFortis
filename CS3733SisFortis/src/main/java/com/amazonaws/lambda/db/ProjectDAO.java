@@ -88,7 +88,8 @@ public class ProjectDAO {
     
     private Project generateProject(ResultSet resultSet) throws Exception {
       String name  = resultSet.getString("idProject");
-      Project p = new Project (name);
+      boolean archived =  resultSet.getBoolean("archived");
+      Project p = new Project (name, archived);
       
       //Try to get tasks for project
       try {

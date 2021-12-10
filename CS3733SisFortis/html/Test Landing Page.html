@@ -96,8 +96,8 @@
         var deleteProjectURL = APIURL + "deleteProject";
         var addTaskURL = APIURL + "addTasks";
         var addTeammateURL = APIURL + "addTeammate"
-        removeTeammateURL = APIURL + "removeTeammate"
-
+         removeTeammateURL = APIURL + "removeTeammate"
+        archiveProjectURL = APIURL + "archiveProject";
         //Variables to allow hiding/unhiding of each webpage
         var LandingPage = true;
         var AdminPage = false;
@@ -169,17 +169,14 @@
             // document.getElementById("testP").innerHTML = "archive";
         }
 
+
         function deleteProjectButtonPress(e){
-
-            //Delete project and update list once project is deleted
-            deleteProject();
-        }
-
-        function deleteProject(){
             console.log("Deleting project");
             var projectName = document.getElementById(highlightedRow).innerHTML;
             // projectName = projectName.substr(projectName.indexOf(" "));
 
+
+            
 
             var data = {};
             data["projectName"] = projectName;
@@ -228,6 +225,61 @@
         }
         
 
+        
+
+        function archiveProjectButtonPress(e){
+            console.log("Archiving project");
+            var projectName = document.getElementById(highlightedRow).innerHTML;
+            // projectName = projectName.substr(projectName.indexOf(" "));
+
+
+            
+
+            var data = {};
+            data["projectName"] = projectName;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", archiveProjectURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            document.getElementById("AdminPageNotification").innerHTML = "Working on archiving project...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processArchiveProjectResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processArchiveProjectResponse("N/A");
+                }
+            };
+        }
+
+        //Print the created project name to screen
+        function processArchiveProjectResponse(result){
+            console.log("result:" + result);
+            var js = JSON.parse(result);
+            if(result != "N/A"){
+                getProjectList();
+                document.getElementById("AdminPageNotification").innerHTML = "Successfully Archived project: " + js["projectName"];
+                highlightedRow = 1;
+                lastHighlightedRow = 1;
+                updateHighlightedRow();
+            }else{
+                document.getElementById("AdminPageNotification").innerHTML = "Could not archive project";
+            }
+        }
         
 
 
@@ -286,23 +338,30 @@
             
             console.log("projects: " + projectList);
             console.log(projectList[0].name);
+            console.log(projectList[0].archived);
             var str = "";
             var rowNum = 1;
             var t = "&emsp;&emsp;";
-
+            var style = " style=\"color:blue;\" ";
             // project = js["project"];
             // projectName = project["name"];
             // tasks = project["tasks"];
 
             projectList.forEach(project => {
-                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + project.name + "</div>";
-                rowNum = rowNum + 1;
+               if(project.archived) {
+                style = " style=\"color:blue;\" "; 
+                
+               }   
+               else{ 
+                style = " style=\"color:black;\" "; 
+               }
+               str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\"" + style + ">" + project.name + "</div>";     
+               rowNum = rowNum + 1;
 
                 try{
                     teammates = project["teammates"];
                     teammates.forEach(teammate => {
-                        str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + t + teammate.name + "</div>";
-                        rowNum = rowNum + 1;
+                        str =  str + '\n' + "<div"+ style + " >" + t + teammate.name + "</div>";
                     })
                 }catch{
                     console.log("Error parsing teammates for project");
@@ -310,7 +369,7 @@
                 
 
 
-                
+            
             });
         
             // str = "No Projects Stored in Database"
