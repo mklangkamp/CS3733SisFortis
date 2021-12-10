@@ -1,4 +1,4 @@
-package com.amazonaws.lambda.deleteProjectHandler;
+package com.amazonaws.lambda.markTaskCompleteHandler;
 
 import java.io.BufferedReader;
 
@@ -20,43 +20,33 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.lambda.db.ProjectDAO;
 import com.amazonaws.lambda.db.TaskDAO;
-import com.amazonaws.lambda.db.TeammateDAO;
 import com.amazonaws.lambda.http.*;
 import com.amazonaws.lambda.model.Project;
 
-public class DeleteProjectHandler implements RequestHandler<DeleteProjectRequest, DeleteProjectResponse> {
+public class MarkTaskCompleteHandler implements RequestHandler<MarkTaskCompleteRequest, MarkTaskCompleteResponse> {
 
 	LambdaLogger logger;
 	
-	ProjectDAO projectDAO;
-	TaskDAO taskDAO;
-	TeammateDAO teammateDAO;
+	TaskDAO dao;
 	
     @Override
-    public DeleteProjectResponse handleRequest(DeleteProjectRequest req, Context context) {
+    public MarkTaskCompleteResponse handleRequest(MarkTaskCompleteRequest req, Context context) {
     	logger = context.getLogger();
-    	projectDAO = new ProjectDAO(logger);
-    	taskDAO = new TaskDAO(logger);
-    	teammateDAO = new TeammateDAO(logger);
-    	logger.log("Loading Java Lambda handler of DeleteProjectHandler");
+    	dao = new TaskDAO(logger);
+    	logger.log("Loading Java Lambda handler of MarkTaskCompleteHandler");
 		logger.log(req.toString());
 		
-		String projectName = "";
 		
-		projectName = req.getProjectName();
 		
 		try {
-			logger.log("Attempting to delete project: " + projectName);
-			projectDAO.deleteProject(new Project(projectName));
-			logger.log("Successfully deleted " + projectName);
+			dao.markTaskComplete(req.projectName, req.taskName);
 		}
 		catch(Exception e){
-			System.out.println("Could not delete project.");
+			System.out.println("Could not mark task complete.");
 		}
 		
-		DeleteProjectResponse response = new DeleteProjectResponse(projectName, 200);
+		MarkTaskCompleteResponse response = new MarkTaskCompleteResponse(req.taskName, 200);
 		
 		return response;
     }

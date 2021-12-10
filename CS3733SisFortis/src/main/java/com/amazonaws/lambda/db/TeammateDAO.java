@@ -77,6 +77,22 @@ java.sql.Connection conn;
         }
     }
     
+    
+    public boolean removeTeammatesOnProject(String projectName) throws Exception {
+        try {
+      	  //System.out.println("adding project");
+      	  	logger.log("removing teammates");
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE Project = ?;");
+            ps.setString(1, projectName);
+            int numAffected = ps.executeUpdate();
+            logger.log("numAffected: " + numAffected);
+            return (numAffected == 1);
+        } catch (Exception e) {
+            throw new Exception("Failed to delete: " + e.getMessage());
+        }
+    }
+    
+    
     public ArrayList<Teammate> getTeammatesForProject(String projectName) throws Exception{
     	
     	ArrayList<Teammate> teammates = new ArrayList<Teammate>();

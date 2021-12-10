@@ -33,6 +33,7 @@ public class AddTaskHandlerTest extends LambdaTest{
 
     void testInput(String incoming, String outgoing) throws IOException {
     	AddTaskHandler handler = new AddTaskHandler();
+    	System.out.println("Created handler");
 
     	AddTaskRequest req = new Gson().fromJson(incoming, AddTaskRequest.class);
     	

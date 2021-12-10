@@ -12,16 +12,19 @@ import org.junit.Test;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.amazonaws.lambda.deleteProjectHandler.DeleteProjectHandler;
-import com.amazonaws.lambda.http.DeleteProjectRequest;
-import com.amazonaws.lambda.http.DeleteProjectResponse;
+import com.amazonaws.lambda.addTaskHandler.AddTaskHandler;
+import com.amazonaws.lambda.http.AddTaskRequest;
+import com.amazonaws.lambda.http.AddTaskResponse;
+import com.amazonaws.lambda.http.MarkTaskCompleteRequest;
+import com.amazonaws.lambda.http.MarkTaskCompleteResponse;
+import com.amazonaws.lambda.markTaskCompleteHandler.MarkTaskCompleteHandler;
 import com.google.gson.Gson;
 
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.
  */
-public class DeleteProjectHandlerTest extends LambdaTest{
+public class MarkTaskCompleteHandlerTest extends LambdaTest{
 	
 	/**
 	 * Helper method that creates a context that supports logging so you can test lambda functions
@@ -32,23 +35,23 @@ public class DeleteProjectHandlerTest extends LambdaTest{
 	 */
 
     void testInput(String incoming, String outgoing) throws IOException {
-    	DeleteProjectHandler handler = new DeleteProjectHandler();
-
-    	DeleteProjectRequest req = new Gson().fromJson(incoming, DeleteProjectRequest.class);
+    	MarkTaskCompleteHandler handler = new MarkTaskCompleteHandler();
+    	System.out.println("Created handler");
+    	MarkTaskCompleteRequest req = new Gson().fromJson(incoming, MarkTaskCompleteRequest.class);
     	
-    	DeleteProjectResponse response = handler.handleRequest(req, createContext("Delete Project"));
+    	MarkTaskCompleteResponse response = handler.handleRequest(req, createContext("Add Task"));
 		
 		
-		Assert.assertEquals(outgoing, response.projectName);
+		Assert.assertEquals(outgoing, response.taskName);
         Assert.assertEquals(200, response.statusCode);
 		
     }
 	
     
     @Test 
-    public void testDeleteProject() {
-    	String SAMPLE_INPUT = "{\"projectName\": \"abc\"}";
-    	String RESULT = "abc";
+    public void testMarkTask() {
+    	String SAMPLE_INPUT = "{\"projectName\":\"abc\", \"taskName\":\"another task\"}";
+    	String RESULT = "another task";
     	
     	try {
     		testInput(SAMPLE_INPUT, RESULT);
@@ -57,10 +60,23 @@ public class DeleteProjectHandlerTest extends LambdaTest{
     	}
     }
     
+    
 //    @Test 
-//    public void testDeleteProject2() {
-//    	String SAMPLE_INPUT = "{\"projectName\": \"aProjectName2\"}";
-//    	String RESULT = "aProjectName";
+//    public void testAddTask2() {
+//    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"def\"},\"task\":{\"name\":\"tempTaskName\", \"id\":\"5.3.3.3.3\", \"status\":false}}";
+//    	String RESULT = "tempTaskName";
+//    	
+//    	try {
+//    		testInput(SAMPLE_INPUT, RESULT);
+//    	}catch (IOException ioe) {
+//    		Assert.fail("Invalid:" + ioe.getMessage());
+//    	}
+//    }
+    
+//    @Test 
+//    public void testAddTask2() {
+//    	String SAMPLE_INPUT = "{\"taskName\": \"aTaskName2\"}";
+//    	String RESULT = "aTaskName";
 //    	
 //    	try {
 //    		testInput(SAMPLE_INPUT, RESULT);
