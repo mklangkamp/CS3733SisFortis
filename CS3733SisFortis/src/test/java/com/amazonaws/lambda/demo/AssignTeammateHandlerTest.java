@@ -9,19 +9,23 @@ import java.io.OutputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.amazonaws.lambda.addTeammateHandler.AddTeammateHandler;
+import com.amazonaws.lambda.http.AddTeammateRequest;
+import com.amazonaws.lambda.http.AddTeammateResponse;
+import com.amazonaws.lambda.http.AssignTeammateRequest;
+import com.amazonaws.lambda.http.AssignTeammateResponse;
+import com.amazonaws.lamda.assignTeammateHandler.AssignTeammateHandler;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.amazonaws.lambda.addTaskHandler.AddTaskHandler;
-import com.amazonaws.lambda.http.AddTaskRequest;
-import com.amazonaws.lambda.http.AddTaskResponse;
+
 import com.google.gson.Gson;
 
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.
  */
-public class AddTaskHandlerTest extends LambdaTest{
+public class AssignTeammateHandlerTest extends LambdaTest{
 	
 	/**
 	 * Helper method that creates a context that supports logging so you can test lambda functions
@@ -32,24 +36,22 @@ public class AddTaskHandlerTest extends LambdaTest{
 	 */
 
     void testInput(String incoming, String outgoing) throws IOException {
-    	AddTaskHandler handler = new AddTaskHandler();
-    	System.out.println("Created handler");
+    	AssignTeammateHandler handler = new AssignTeammateHandler();
 
-    	AddTaskRequest req = new Gson().fromJson(incoming, AddTaskRequest.class);
+    	AssignTeammateRequest req = new Gson().fromJson(incoming, AssignTeammateRequest.class);
     	
-    	AddTaskResponse response = handler.handleRequest(req, createContext("Add Task"));
+    	AssignTeammateResponse response = handler.handleRequest(req, createContext("Assign Teammate"));
 		
-		
-		Assert.assertEquals(outgoing, response.taskName);
+		Assert.assertEquals(outgoing, response.teammateName);
         Assert.assertEquals(200, response.statusCode);
 		
     }
 	
     
     @Test 
-    public void testAddTask() {
-    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"abc\"},\"task\":{\"name\":\"test\", \"id\":\"5.3.3.3.3\", \"status\":false}}";
-    	String RESULT = "test";
+    public void testAssignTeammate() {
+    	String SAMPLE_INPUT = "{\"idTask\": \"1\", \"teammateName\": \"Bob\", \"idProject\": \"abc\"}";
+    	String RESULT = "Bob";
     	
     	try {
     		testInput(SAMPLE_INPUT, RESULT);
@@ -57,12 +59,11 @@ public class AddTaskHandlerTest extends LambdaTest{
     		Assert.fail("Invalid:" + ioe.getMessage());
     	}
     }
-    
     
     @Test 
-    public void testAddTask2() {
-    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"def\"},\"task\":{\"name\":\"tempTaskName\", \"id\":\"5.3.3.3.3\", \"status\":false}}";
-    	String RESULT = "tempTaskName";
+    public void testAssignTeammate2() {
+    	String SAMPLE_INPUT = "{\"idTask\": \"1\", \"teammateName\": \"Jim\", \"idProject\": \"NewTestProject\"}";
+    	String RESULT = "Jim";
     	
     	try {
     		testInput(SAMPLE_INPUT, RESULT);
@@ -70,6 +71,7 @@ public class AddTaskHandlerTest extends LambdaTest{
     		Assert.fail("Invalid:" + ioe.getMessage());
     	}
     }
+    
     
 //    @Test 
 //    public void testAddTask2() {
@@ -138,4 +140,5 @@ public class AddTaskHandlerTest extends LambdaTest{
 		System.out.println("SDSD");
 	}
 }
+
 

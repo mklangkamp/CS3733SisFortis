@@ -14,6 +14,9 @@ public class TaskDAO {
 java.sql.Connection conn;
 	
 	final String tblName = "Task";   // Exact capitalization
+	final String tblName2 = "TeammateToTask";   // Exact capitalization
+	
+	TeammateDAO teammateDAO;
 	LambdaLogger logger;
 
     public TaskDAO(LambdaLogger logger) {
@@ -95,12 +98,130 @@ java.sql.Connection conn;
         }
     }
     
+    public boolean addSubtask(Project project, Task task) throws Exception {
+        try {
+      	  logger.log("adding subtask");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? AND Project = ? AND ParentTask = ?;");
+            ps.setString(1, task.id);
+            ps.setString(2, project.name); 
+            ps.setString(3, task.idParent);
+//            logger.log("Before the resultSet");
+            ResultSet resultSet = ps.executeQuery();
+//            logger.log("After the resultSet");
+            
+            while (resultSet.next()) {
+//            	logger.log("in the while loop");
+                resultSet.close();
+                ps.close();
+//                logger.log("Task already exists, could not add.");
+                return false; //IF the taskID and the project name are already in the project, don't insert it.
+            }
+            ps.close();
+            
+//            logger.log("checking for parent to be in same project");
+            ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? AND Project = ?;");
+            ps.setString(1, task.idParent);
+            ps.setString(2, project.name);
+//            logger.log("Before second resultSet");
+            resultSet = ps.executeQuery();
+//            logger.log("After second resultSet");
+            
+            if (resultSet.next()) {
+//            	logger.log("in the second while loop");
+//            	Task t = generateTask(resultSet);
+                resultSet.close();
+                logger.log("Parent Task exists.");
+                ps.close();
+                // pass through
+            }
     
-        private Task generateTask(ResultSet resultSet) throws Exception {
+            else {
+            	logger.log("Parent task does not exist");
+            	ps.close();
+            	return false; //IF the parent does not exist, do not insert
+            }
+            
+            logger.log("Before the preparedStatement");
+            ps = conn.prepareStatement("INSERT INTO " + tblName + " (idTask,Name,Status,ParentTask,Project) values(?,?,?,?,?);");
+            logger.log("After the preparedStatement");
+            
+            ps.setString(1, task.id);
+            ps.setString(2, task.name);
+            ps.setBoolean(3, task.status);
+            // if this is a subtask, this should not be null (null for top level tasks only, iteration #2)
+            //ps.setString(4, null);
+//            logger.log("Before setting parentName");
+            ps.setString(4, task.idParent);
+//            logger.log("After setting parentName");
+            ps.setString(5, project.name);
+//            logger.log("Before the execute");
+            ps.execute();
+            ps.close();
+            return true;
+
+        } catch (Exception e) {
+            throw new Exception("Failed to add: " + e.getMessage());
+        }
+    }
+    
+    
+    
+//    public boolean addSubtask(Project project, Task task) throws Exception {
+//        try {
+//      	  logger.log("adding subtask");
+//            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? AND Project = ? AND ParentTask = ?;");
+//            ps.setString(1, task.id);
+//            ps.setString(2, project.name);
+//            ps.setString(3, task.parentName);
+//            logger.log("Before the resultSet");
+//            ResultSet resultSet = ps.executeQuery();
+//            logger.log("After the resultSet");
+//            
+//            while (resultSet.next()) {
+//            	logger.log("in the while loop");
+//                resultSet.close();
+//                logger.log("Task already exists, could not add.");
+//                return false; //IF the taskID and the project name are already in the project, dont insert it.
+//            }
+//            
+//            logger.log("Before the preparedStatement");
+//            ps = conn.prepareStatement("INSERT INTO " + tblName + " (idTask,Name,Status,ParentTask,Project) values(?,?,?,?,?);");
+//            logger.log("After the preparedStatement");
+//            
+//            ps.setString(1, task.id);
+//            ps.setString(2, task.name);
+//            ps.setBoolean(3, task.status);
+//            // if this is a subtask, this should not be null (null for top level tasks only, iteration #2)
+//            //ps.setString(4, null);
+//            logger.log("Before setting parentName");
+//            ps.setString(4, task.parentName);
+//            logger.log("After setting parentName");
+//            ps.setString(5, project.name);
+//            logger.log("Before the execute");
+//            ps.execute();
+//            return true;
+//
+//        } catch (Exception e) {
+//            throw new Exception("Failed to add: " + e.getMessage());
+//        }
+//    }
+    
+    
+        public Task generateTask(ResultSet resultSet) throws Exception {
             String id  = resultSet.getString("idTask");
             String name = resultSet.getString("Name");
             Boolean status = resultSet.getBoolean("Status");
-            return new Task (id, name, status);
+            String idParent;
+            try {
+            	 idParent = resultSet.getString("idParent");
+            }
+           catch(Exception e) {
+        	   idParent = "";
+           }
+            String idProject = resultSet.getString("idProject");
+            Task t =  new Task(id, name, status, idParent, idProject);
+            ArrayList<String> assignedTeammates = t.getAssignedTeammates(id, idProject);
+            return new Task (id, name, status, assignedTeammates);
         }
         
         public boolean markTaskComplete(String projectName, String taskName) throws Exception{

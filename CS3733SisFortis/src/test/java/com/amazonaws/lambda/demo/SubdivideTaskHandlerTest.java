@@ -15,13 +15,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.amazonaws.lambda.addTaskHandler.AddTaskHandler;
 import com.amazonaws.lambda.http.AddTaskRequest;
 import com.amazonaws.lambda.http.AddTaskResponse;
+import com.amazonaws.lambda.http.SubdivideTaskRequest;
+import com.amazonaws.lambda.http.SubdivideTaskResponse;
+import com.amazonaws.lambda.subdivideTaskHandler.SubdivideTaskHandler;
 import com.google.gson.Gson;
 
 
 /**
  * A simple test harness for locally invoking your Lambda function handler.
  */
-public class AddTaskHandlerTest extends LambdaTest{
+public class SubdivideTaskHandlerTest extends LambdaTest{
 	
 	/**
 	 * Helper method that creates a context that supports logging so you can test lambda functions
@@ -32,12 +35,11 @@ public class AddTaskHandlerTest extends LambdaTest{
 	 */
 
     void testInput(String incoming, String outgoing) throws IOException {
-    	AddTaskHandler handler = new AddTaskHandler();
-    	System.out.println("Created handler");
+    	SubdivideTaskHandler handler = new SubdivideTaskHandler();
 
-    	AddTaskRequest req = new Gson().fromJson(incoming, AddTaskRequest.class);
+    	SubdivideTaskRequest req = new Gson().fromJson(incoming, SubdivideTaskRequest.class);
     	
-    	AddTaskResponse response = handler.handleRequest(req, createContext("Add Task"));
+    	SubdivideTaskResponse response = handler.handleRequest(req, createContext("Subdivide Task"));
 		
 		
 		Assert.assertEquals(outgoing, response.taskName);
@@ -47,9 +49,9 @@ public class AddTaskHandlerTest extends LambdaTest{
 	
     
     @Test 
-    public void testAddTask() {
-    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"abc\"},\"task\":{\"name\":\"test\", \"id\":\"5.3.3.3.3\", \"status\":false}}";
-    	String RESULT = "test";
+    public void testSubdivideTask() {
+    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"abc\"},\"task\":{\"name\":\"testing\", \"id\":\"5.3\", \"status\":false, \"idParent\":\"1\"}}";
+    	String RESULT = "testSubtask";
     	
     	try {
     		testInput(SAMPLE_INPUT, RESULT);
@@ -59,17 +61,17 @@ public class AddTaskHandlerTest extends LambdaTest{
     }
     
     
-    @Test 
-    public void testAddTask2() {
-    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"def\"},\"task\":{\"name\":\"tempTaskName\", \"id\":\"5.3.3.3.3\", \"status\":false}}";
-    	String RESULT = "tempTaskName";
-    	
-    	try {
-    		testInput(SAMPLE_INPUT, RESULT);
-    	}catch (IOException ioe) {
-    		Assert.fail("Invalid:" + ioe.getMessage());
-    	}
-    }
+//    @Test 
+//    public void testAddTask2() {
+//    	String SAMPLE_INPUT = "{\"project\": {\"name\":\"def\"},\"task\":{\"name\":\"tempTaskName\", \"id\":\"5.3.3.3.3\", \"status\":false}}";
+//    	String RESULT = "tempTaskName";
+//    	
+//    	try {
+//    		testInput(SAMPLE_INPUT, RESULT);
+//    	}catch (IOException ioe) {
+//    		Assert.fail("Invalid:" + ioe.getMessage());
+//    	}
+//    }
     
 //    @Test 
 //    public void testAddTask2() {
@@ -138,4 +140,5 @@ public class AddTaskHandlerTest extends LambdaTest{
 		System.out.println("SDSD");
 	}
 }
+
 

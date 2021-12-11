@@ -14,6 +14,10 @@ public class TeammateDAO {
 java.sql.Connection conn;
 	
 	final String tblName = "Teammate";   // Exact capitalization
+	final String tblName2 = "TeammateToTask";   // Exact capitalization
+	
+	TaskDAO taskDAO;
+	
 	LambdaLogger logger;
 
     public TeammateDAO(LambdaLogger logger) {
@@ -117,7 +121,8 @@ java.sql.Connection conn;
     	return teammates;
     }
     
-        private Teammate generateTeammate(ResultSet resultSet) throws Exception {
+    
+        public Teammate generateTeammate(ResultSet resultSet) throws Exception {
             String name  = resultSet.getString("idTeammate");
             return new Teammate(name);
         }
