@@ -33,6 +33,41 @@ public class ListProjectHandler implements RequestHandler<ListProjectRequest, Li
 			System.out.println("Could not list projects.");
 		}
 		
+		
+		
+		System.out.println("Projects, assignees and their tasks");
+		projects.forEach(p -> {
+			System.out.println("\n\n");
+		      
+		      System.out.println("Project Name: " + p.name);
+		      
+		      p.teammates.forEach(teammate -> {
+		    	  System.out.println("\t" + teammate.name);
+		    	  teammate.taskList.forEach(task -> {
+		    		  System.out.println("\t\t" + task.name);
+		    	  });
+		    	  
+			  });
+		});
+		
+		
+		
+		System.out.println("\n------------------------------------------------------------\nProjects, tasks and their assignees");
+		projects.forEach(p -> {
+			System.out.println("\n\n");
+		      
+		      System.out.println("Project Name: " + p.name);
+		      
+		      p.tasks.forEach(task -> {
+		    	  System.out.println("\t" + task.name);
+		    	  task.assignedTeammates.forEach(teammate -> {
+		    		  System.out.println("\t\t" + teammate);
+		    	  });
+		    	  
+			  });
+		});
+		
+		
 		ListProjectResponse response = new ListProjectResponse(projects, 200);
 		
 		return response;

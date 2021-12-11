@@ -16,12 +16,13 @@ java.sql.Connection conn;
 	final String tblName = "Teammate";   // Exact capitalization
 	final String tblName2 = "TeammateToTask";   // Exact capitalization
 	
-	TaskDAO taskDAO;
+	TeammateToTaskDAO teammateToTaskDAO;
 	
 	LambdaLogger logger;
 
     public TeammateDAO(LambdaLogger logger) {
     	this.logger = logger;
+    	this.teammateToTaskDAO = new TeammateToTaskDAO(logger);
     	try  {
     		logger.log("Trying to connect to database");
     		conn = DatabaseUtil.connect();
@@ -32,6 +33,8 @@ java.sql.Connection conn;
     	}
     }
 	
+    
+    
     public boolean addTeammate(String projectName, String teammateName) throws Exception {
         try {
       	  logger.log("adding teammate");
@@ -108,7 +111,7 @@ java.sql.Connection conn;
 	        ResultSet resultSet = ps.executeQuery();
 	        
 	        while (resultSet.next()) {
-	            teammates.add(generateTeammate(resultSet));
+	            teammates.add(this.generateTeammateWithTasks(resultSet));
 	        }
 	        resultSet.close();
 	        
@@ -124,7 +127,26 @@ java.sql.Connection conn;
     
         public Teammate generateTeammate(ResultSet resultSet) throws Exception {
             String name  = resultSet.getString("idTeammate");
+            String idProject  = resultSet.getString("idProject");
+            
+//            ArrayList<Task> taskList = this.teammateToTaskDAO.getAllTeammateTasks(name, idProject);
+//            
+//            logger.log("\n Name: " + name + "\t idProject: " + idProject);
+//            taskList.forEach(task -> logger.log("\t" + task.name));            
+            
             return new Teammate(name);
+        }
+        
+        public Teammate generateTeammateWithTasks(ResultSet resultSet) throws Exception {
+            String name  = resultSet.getString("idTeammate");
+            String idProject  = resultSet.getString("Project");
+
+            ArrayList<Task> taskList = this.teammateToTaskDAO.getAllTeammateTasks(name, idProject);
+            
+//            logger.log("\nName: " + name + "\t idProject: " + idProject);
+//            taskList.forEach(task -> logger.log("\t" + task.name));            
+            
+            return new Teammate(name,taskList);
         }
         
 }

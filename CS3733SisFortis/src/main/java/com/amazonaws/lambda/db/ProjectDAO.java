@@ -37,6 +37,7 @@ public class ProjectDAO {
     	}
     }
     
+    
     public boolean addProject(Project project) throws Exception {
       try {
     	  //System.out.println("adding project");
@@ -113,6 +114,11 @@ public class ProjectDAO {
     	  logger.log("Could not find teammates for: " + name);
       }
       
+      
+      
+      
+//      System.out.println(.get(0).taskList.get(0).name);
+      
       return p;
   }
     
@@ -129,7 +135,7 @@ public class ProjectDAO {
 	          while (resultSet.next()) {
 	//        	  logger.log(resultSet.toString());
 	              Project p = generateProject(resultSet);
-	              logger.log(p.name);
+	              logger.log("Project Name: " + p.name);
 	              allProjects.add(p);
 	          }
 	          logger.log("Projects added to allProjects");

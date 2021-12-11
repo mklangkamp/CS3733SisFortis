@@ -13,8 +13,6 @@ public class TeammateToTaskDAO {
 
 java.sql.Connection conn;
 	
-	TaskDAO taskDAO;
-	TeammateDAO teammateDAO;
 
 	final String tblName = "TeammateToTask";   // Exact capitalization
 	final String tblName2 = "Task";   // Exact capitalization
@@ -115,7 +113,7 @@ java.sql.Connection conn;
 	      ArrayList<String> allTaskTeammates = new ArrayList<>();
 	    	
 	    	try {
-		    	logger.log("getting teammate for task: " + idTask);
+		    	logger.log("\tgetting teammate for task: " + idTask);
 		        PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? and idProject = ?;");
 		        ps.setString(1, idTask);
 //		        logger.log(idTask);
@@ -146,14 +144,43 @@ java.sql.Connection conn;
 	    	
 	    	try {
 		    	logger.log("getting tasks for teammate: " + teammateName);
-		        PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + "," + tblName2 + "WHERE idTeammate = ? AND" + tblName2 + ".idTask =" + tblName + ".idTask AND" 
-		    	+ tblName2 + ".Project =" + tblName + ".idProject;");
+		  
+		    	//Determine the task IDs that the teammate is assigned to
+		        PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTeammate = ?;");
+		        
+//		        System.out.println("SELECT * FROM " + tblName + " WHERE idTeammate = ?;");
 		        ps.setString(1, teammateName);
-		        ps.setString(2, idProject);
+		        
 		        ResultSet resultSet = ps.executeQuery();
+		       
+		        
+		        String str = "SELECT * FROM " + tblName2 + " WHERE (";
+		        String projectName = "";
+		        
+
+		        //Use the task IDs found above to generate a query string
 		        
 		        while (resultSet.next()) {
-		        	allTeammateTasks.add(taskDAO.generateTask(resultSet));
+		        	
+		        	str = str + "idTask = \"" + resultSet.getString("idTask") + "\" OR ";
+					projectName = resultSet.getString("idProject");
+		        }
+		        
+		        str = str.substring(0, str.length() - 3);
+		        
+		        
+		        str = str + ") AND Project = \"" + projectName + "\"";
+		        resultSet.close();
+		        
+		        
+		        
+		        //Get the results of the query (all tasks with IDs of tasks that the person is assigned to in the project)
+//		        System.out.println(str);
+		        ps = conn.prepareStatement(str);
+		        resultSet = ps.executeQuery();
+		        
+		        while (resultSet.next()) {
+		        	allTeammateTasks.add(this.generateTaskWithoutTeammates(resultSet));
 		        }
 		        resultSet.close();
 		        
@@ -161,9 +188,19 @@ java.sql.Connection conn;
 		        
 		        
 	    	}catch(Exception e){
-	    		throw new Exception("Failed to get tasks for this teammate: " + e.getMessage());
+	    		logger.log("Failed to get tasks for this teammate: " + teammateName);
 	    	}
 	    	return allTeammateTasks;
-}
+    }
+    
+    public Task generateTaskWithoutTeammates(ResultSet resultSet) throws Exception {
+//    	logger.log("generating task from result set");
+        String id  = resultSet.getString("idTask");
+        String name = resultSet.getString("Name");
+        Boolean status = resultSet.getBoolean("Status");
+//        String idProject = resultSet.getString("Project");
+
+        return new Task (id, name, status);
+    }
         
 }
