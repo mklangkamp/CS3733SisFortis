@@ -17,10 +17,13 @@ java.sql.Connection conn;
 	final String tblName2 = "TeammateToTask";   // Exact capitalization
 	
 	TeammateDAO teammateDAO;
+	TeammateToTaskDAO teammateToTaskDAO;
 	LambdaLogger logger;
 
     public TaskDAO(LambdaLogger logger) {
     	this.logger = logger;
+    	this.teammateToTaskDAO = new TeammateToTaskDAO(logger);
+    	this.teammateDAO = new TeammateDAO(logger);
     	try  {
     		logger.log("Trying to connect to database");
     		conn = DatabaseUtil.connect();
@@ -66,19 +69,25 @@ java.sql.Connection conn;
         try {
       	  	logger.log("getting Tasks for: " + p.name);
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE Project = ?;");
+//            logger.log("before setString");
             ps.setString(1, p.name);
+//            logger.log("after setString");
             ResultSet resultSet = ps.executeQuery();
+//            logger.log("after execute");
                      
             ArrayList<Task> taskList = new ArrayList<Task>();
             
             while (resultSet.next()) {
+//            	logger.log("in while loop");
                 taskList.add(generateTask(resultSet));
             }
+//            logger.log("after while loop");
             resultSet.close();
-
+            
             return taskList;
 
         } catch (Exception e) {
+//        	logger.log("exception in getTaskForProject");
             throw new Exception("Failed to add: " + e.getMessage());
         }
     }
@@ -208,19 +217,25 @@ java.sql.Connection conn;
     
     
         public Task generateTask(ResultSet resultSet) throws Exception {
+        	logger.log("generating task from result set");
             String id  = resultSet.getString("idTask");
+//            logger.log(id);
             String name = resultSet.getString("Name");
             Boolean status = resultSet.getBoolean("Status");
-            String idParent;
-            try {
-            	 idParent = resultSet.getString("idParent");
-            }
-           catch(Exception e) {
-        	   idParent = "";
-           }
-            String idProject = resultSet.getString("idProject");
-            Task t =  new Task(id, name, status, idParent, idProject);
-            ArrayList<String> assignedTeammates = t.getAssignedTeammates(id, idProject);
+//            String idParent;
+//            try {
+//            	 idParent = resultSet.getString("idParent");
+//            }
+//           catch(Exception e) {
+//        	   idParent = "";
+//           }
+            String idProject = resultSet.getString("Project");
+//            logger.log("idProject: " + idProject);
+//            Task t =  new Task(id, name, status, idParent, idProject);
+//            ArrayList<String> assignedTeammates = t.getAssignedTeammates(id, idProject);
+            ArrayList<String> assignedTeammates = teammateToTaskDAO.getAllTaskTeammates(id,idProject);
+            logger.log(name);
+            assignedTeammates.forEach(teammate -> logger.log(teammate));
             return new Task (id, name, status, assignedTeammates);
         }
         

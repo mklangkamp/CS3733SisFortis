@@ -61,7 +61,7 @@ public class Task {
 		this.id = id;
 		this.name = name;
 		this.assignedTeammates = assignedTeammates;
-//		this.status = status;
+		this.status = status;
 //		this.assignedTeammates = assignedTeammates;
 //		this.subtasks = subtasks;
 	}

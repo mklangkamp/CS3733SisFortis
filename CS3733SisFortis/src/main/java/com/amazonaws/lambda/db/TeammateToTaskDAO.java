@@ -110,6 +110,7 @@ java.sql.Connection conn;
     }
     
     public ArrayList<String> getAllTaskTeammates(String idTask, String idProject) throws Exception {
+//    	logger.log("in the getAllTaskTeammates");
         
 	      ArrayList<String> allTaskTeammates = new ArrayList<>();
 	    	
@@ -117,10 +118,14 @@ java.sql.Connection conn;
 		    	logger.log("getting teammate for task: " + idTask);
 		        PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? and idProject = ?;");
 		        ps.setString(1, idTask);
+//		        logger.log(idTask);
 		        ps.setString(2, idProject);
+//		        logger.log(idProject);
 		        ResultSet resultSet = ps.executeQuery();
 		        
 		        while (resultSet.next()) {
+//		        	logger.log("in the while loop");
+//		        	logger.log(resultSet.getString("idTeammate"));
 		        	allTaskTeammates.add(resultSet.getString("idTeammate"));
 		        }
 		        resultSet.close();
@@ -129,6 +134,7 @@ java.sql.Connection conn;
 		        
 		        
 	    	}catch(Exception e){
+//	    		logger.log("exception in getAllTaskTeammate");
 	    		throw new Exception("Failed to get teammates for this task: " + e.getMessage());
 	    	}
 	    	return allTaskTeammates;
