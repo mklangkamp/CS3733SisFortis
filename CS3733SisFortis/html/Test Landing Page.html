@@ -1,3 +1,7 @@
+
+<!-- //#1: when highlighted row has a checkmark, the button says "unmark complete" and vice versa
+     //#2: modify the lambda to make it so that it pulls the task from the table, determines its status, and marks it the opposite. -->
+
 <html>
     <style>
         body{
@@ -96,7 +100,10 @@
         var deleteProjectURL = APIURL + "deleteProject";
         var addTaskURL = APIURL + "addTasks";
         var addTeammateURL = APIURL + "addTeammate"
-        removeTeammateURL = APIURL + "removeTeammate"
+        var removeTeammateURL = APIURL + "removeTeammate"
+        var archiveProjectURL = APIURL + "archiveProject";
+        var markTaskCompletedURL = APIURL + "markTask"
+
 
         //Variables to allow hiding/unhiding of each webpage
         var LandingPage = true;
@@ -110,6 +117,9 @@
         //Vars to keep display data for project stored so it doesnt need to be regenerated each time user switches between project view and team view.
         var teamViewDisplayData = "teamViewPlaceHolderData";
         var projectViewDisplayData = "projectViewPlaceHolderData";
+
+
+        var checkMark = "✅";
 
 
         //GENERAL USE FUNCTIONS ---------------------------------------------------------
@@ -151,13 +161,36 @@
 
         //Unhighlights previously selected row, and highlights newly selected row. 
         function updateHighlightedRow(){
+            try{
+                document.getElementById(lastHighlightedRow).innerHTML
+                document.getElementById(highlightedRow).innerHTML
+            }catch{
+                highlightedRow = 1;
+                lastHighlightedRow = 1;
+            }
             document.getElementsByName(lastHighlightedRow).forEach(e => e.style.backgroundColor = "white");
             document.getElementsByName(highlightedRow).forEach(e => e.style.backgroundColor = "yellow");
+
+            try{
+                //Set the mark task button to unmark task when needed
+                var highlightedRowText = document.getElementById(highlightedRow).innerHTML;
+                
+                if(highlightedRowText.indexOf(checkMark) == -1){
+                    document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Complete"                
+                }else{
+                    document.getElementById("MarkSelectedTaskButton").value = "Mark Selected Task Incomplete"
+                }
+            }catch{
+                
+            }
+
+
         }
 
         function writeToDisplayBox(str){
             var elements = document.getElementsByName("AdminProjectDisplayBox");
             elements.forEach(element => element.innerHTML = str);
+            updateHighlightedRow();
         }
 
         //ADMIN PAGE FUNCTIONS ---------------------------------------------------------
@@ -169,17 +202,15 @@
             // document.getElementById("testP").innerHTML = "archive";
         }
 
+
         function deleteProjectButtonPress(e){
-
-            //Delete project and update list once project is deleted
-            deleteProject();
-        }
-
-        function deleteProject(){
             console.log("Deleting project");
             var projectName = document.getElementById(highlightedRow).innerHTML;
+            projectName = projectName.substring(0,projectName.lastIndexOf(" "));
             // projectName = projectName.substr(projectName.indexOf(" "));
 
+
+            
 
             var data = {};
             data["projectName"] = projectName;
@@ -221,13 +252,68 @@
                 document.getElementById("AdminPageNotification").innerHTML = "Successfully deleted project: " + js["projectName"];
                 highlightedRow = 1;
                 lastHighlightedRow = 1;
-                updateHighlightedRow();
             }else{
                 document.getElementById("AdminPageNotification").innerHTML = "Could not delete project";
             }
+            
         }
         
 
+        
+
+        function archiveProjectButtonPress(e){
+            console.log("Archiving project");
+            var projectName = document.getElementById(highlightedRow).innerHTML;
+            // projectName = projectName.substr(projectName.indexOf(" "));
+
+
+            
+
+            var data = {};
+            data["projectName"] = projectName;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", archiveProjectURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            document.getElementById("AdminPageNotification").innerHTML = "Working on archiving project...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processArchiveProjectResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processArchiveProjectResponse("N/A");
+                }
+            };
+        }
+
+        //Print the created project name to screen
+        function processArchiveProjectResponse(result){
+            console.log("result:" + result);
+            var js = JSON.parse(result);
+            if(result != "N/A"){
+                getProjectList();
+                document.getElementById("AdminPageNotification").innerHTML = "Successfully Archived project: " + js["projectName"];
+                highlightedRow = 1;
+                lastHighlightedRow = 1;
+                updateHighlightedRow();
+            }else{
+                document.getElementById("AdminPageNotification").innerHTML = "Could not archive project";
+            }
+        }
         
 
 
@@ -273,6 +359,7 @@
                 }else{
                     processListProjectsResponse("N/A");
                 }
+                updateHighlightedRow();
             };
         }
 
@@ -286,31 +373,62 @@
             
             console.log("projects: " + projectList);
             console.log(projectList[0].name);
+            console.log(projectList[0].archived);
             var str = "";
             var rowNum = 1;
             var t = "&emsp;&emsp;";
-
+            var style = " style=\"color:blue;\" ";
             // project = js["project"];
             // projectName = project["name"];
             // tasks = project["tasks"];
 
             projectList.forEach(project => {
-                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + project.name + "</div>";
+
+               if(project.archived) {
+                style = " style=\"color:blue;\" "; 
+                
+               }   
+               else{ 
+                style = " style=\"color:black;\" "; 
+               }
+               
+                
+                //Determine status metricics for the tasks in the project.
+                try{
+                    tasks = project["tasks"];
+                    var numTasks = 0;
+                    var numTasksComplete = 0;
+                    tasks.forEach(task =>{
+                        if(task.status){
+                            numTasksComplete++;
+                        }
+                        numTasks++;
+                    })
+                }catch{
+                    console.log("No tasks for this project")
+                }
+                if(numTasks != 0){
+                    statusMetric = ((numTasksComplete/numTasks)*100).toFixed(); //toFixed(numDecimals) sets value to zero decmial places
+                }else{
+                    statusMetric = 0;
+                }
+
+                //str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\"" + style + ">" + project.name + "</div>";     
+              
+                //Create display string for projects
+                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\"" + style +  ">" + project.name + " " + statusMetric +"%</div>";
                 rowNum = rowNum + 1;
+
 
                 try{
                     teammates = project["teammates"];
                     teammates.forEach(teammate => {
-                        str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + t + teammate.name + "</div>";
-                        rowNum = rowNum + 1;
+                        str =  str + '\n' + "<div"+ style + " >" + t + teammate.name + "</div>";
                     })
                 }catch{
                     console.log("Error parsing teammates for project");
                 }
-                
 
-
-                
             });
         
             // str = "No Projects Stored in Database"
@@ -413,7 +531,7 @@
                 console.log("Could not find project and tasks in response");
             }
 
-            console.log(document.getElementById("ProjectView").hidden)
+            // console.log(document.getElementById("ProjectView").hidden)
             //Parse the list of tasks
             try{
                 generateProjectViewText(tasks); //Generate the text, then display the correct one.
@@ -427,46 +545,97 @@
             }catch{
                 console.log("Could not parse tasks");
             }
-            updateHighlightedRow();
+
+            try{
+                updateTeammateSelectOptions(teammates);
+            }catch{
+                console.log("Could not update teammate dropdown.")
+            }
         }
+
+
+        function generateTaskString(task, rowNum, tab){
+            var str = "";
+            if(task.status == false){
+                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name +"&emsp;" +  "</div>";
+            }else{
+                str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "&emsp;" + checkMark + "</div>";
+            }
+            return str;
+        }
+
+        
+
+
+
+        function updateTeammateSelectOptions(teammates){
+            // <option value="volvo">Volvo</option>
+            var str = "";
+            teammates.forEach(teammate => {
+                // console.log(teammate.name);
+                str = str + '\n' + "<option value=\"" + teammate.name + "\">" + teammate.name + "</option>";
+                // console.log(str);
+            });
+            document.getElementById("ProjectViewTeammateInput").innerHTML = str;
+        }
+
 
 
         function generateProjectViewText(tasks){
             var str = "";
-            taskNum = 1;
+            rowNum = 1;
+            var tab = "&emsp;&emsp;";
             try{
                 tasks.forEach(task => {
-                    str =  str + '\n' + "<div name=\"" + taskNum + "\" id=\"" + taskNum + "\">" + task.id + " " + task.name + "</div>";
-                    taskNum = taskNum + 1;
+                    str = str + generateTaskString(task, rowNum,"");
+                    rowNum = rowNum + 1;
+                    
+                    var assignees = task["assignees"]
+                    if (assignees != undefined){
+                        assignees.forEach (assignee => {
+                            str = str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + assignee + "</div>";
+                            rowNum = rowNum +1;
+                        });  
+                    }
+
                 });
             }catch{
                 str = "No tasks exist for this project";
             }
-            console.log(str);
+            // console.log(str);
             projectViewDisplayData = str;
 
             // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
             // writeToDisplayBox(str);
-            updateHighlightedRow();
+            // updateHighlightedRow();
         }
 
         function generateTeamViewText(teammates){
             var str = "";
             rowNum = 1;
+            var tab = "&emsp;&emsp;";
             try{
                 teammates.forEach(teammate => {
                     str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + teammate.name + "</div>";
-                    rowNum = rowNum + 1;
-                });
+                    rowNum = rowNum + 1
+                    
+                    var tasks = teammate["tasks"]
+                    if (tasks != undefined){
+                        tasks.forEach (task => {
+                            str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "</div>";
+                            rowNum = rowNum +1;
+                        });
+                    }
+                });    
             }catch{
                 str = "No teammates exist for this project";
             }
-            console.log(str);
+            // console.log(str);
             teamViewDisplayData = str;
 
             // document.getElementById("AdminProjectDisplayBox").innerHTML = str;
             // writeToDisplayBox(str);
-            updateHighlightedRow();
+            // updateHighlightedRow();
         }
 
         
@@ -587,6 +756,84 @@
                     processAddTaskResponse("N/A");
                 }
             };
+        }
+
+
+        
+
+
+        // Handler for marking a task as complete
+        function MarkSelectedTaskButtonPress(){
+            var form = document.testForm;
+            var textVal = form.textBox.value;
+
+            //Remove the id # and checkmark from the task name
+            var taskName = document.getElementById(highlightedRow).innerHTML;
+            var markingComplete = true;
+
+            if(taskName.indexOf(checkMark) == -1){
+                taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-1);
+            }else{
+                taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-2);
+                markingComplete = false;
+            }
+            
+
+            var data = {};
+            data["projectName"] = textVal;
+            data["taskName"] = taskName;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", markTaskCompletedURL, true);
+
+            if(markingComplete){
+                document.getElementById("ProjectViewNotification").innerHTML = "Marking task: " + taskName + " as complete";
+            }else{
+                document.getElementById("ProjectViewNotification").innerHTML = "Marking task: " + taskName + " as incomplete";    
+            }
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processMarkTaskCompleteResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processMarkTaskCompleteResponse("N/A");
+                }
+            };
+        }
+
+        function processMarkTaskCompleteResponse(result){
+            console.log("result:" + result);
+            var js = JSON.parse(result);
+            
+            //If the task did not have the checkmark before being marked, it is marked as complete. Otherwise marked as incomplete.
+            var taskName = document.getElementById(highlightedRow).innerHTML;
+            
+            if(taskName.indexOf(checkMark) == -1){
+                taskStatus = "complete";
+            }else{
+                taskStatus = "incomplete"
+            }
+
+            if(result == "N/A"){
+                document.getElementById("ProjectViewNotification").innerHTML = "Could not change task marking for: " + js.taskName;
+                return;
+            }
+            document.getElementById("ProjectViewNotification").innerHTML = "Marked task: " + js.taskName + " as " + taskStatus;
+            openProject();
         }
 
 
@@ -972,7 +1219,15 @@
                 
                 
                 <form name="TextBoxForm" method="post">
-                    <input type="text" value="" class="textBox" id="ProjectViewTeammateInput">
+                    <!-- <input type="text" value="" class="textBox" id="ProjectViewTeammateInput"> -->
+                    <select name="ProjectViewTeammateInput" id="ProjectViewTeammateInput">
+                        <!-- Use document.getElementById("ProjectViewTeammateInput").value to get selected value. -->
+                        <!-- <option value="volvo">Volvo</option>
+                        <option value="saab">Saab</option>
+                        <option value="mercedes">Mercedes</option>
+                        <option value="audi">Audi</option> -->
+                    </select>
+
                 </form>
                 
                 
