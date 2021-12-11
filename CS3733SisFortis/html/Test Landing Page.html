@@ -590,7 +590,7 @@
                     str = str + generateTaskString(task, rowNum,"");
                     rowNum = rowNum + 1;
                     
-                    var assignees = task["assignees"]
+                    var assignees = task["assignedTeammates"]
                     if (assignees != undefined){
                         assignees.forEach (assignee => {
                             str = str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + assignee + "</div>";
@@ -619,7 +619,7 @@
                     str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + teammate.name + "</div>";
                     rowNum = rowNum + 1
                     
-                    var tasks = teammate["tasks"]
+                    var tasks = teammate["taskList"]
                     if (tasks != undefined){
                         tasks.forEach (task => {
                             str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "</div>";
