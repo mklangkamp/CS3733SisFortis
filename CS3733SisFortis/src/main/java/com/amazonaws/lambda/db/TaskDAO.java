@@ -224,4 +224,40 @@ java.sql.Connection conn;
             return new Task (id, name, status, assignedTeammates);
         }
         
+        public boolean markTaskComplete(String projectName, String taskName) throws Exception{
+        	try {
+        		logger.log("Checking if task is complete or incomplete");
+                PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE (Name,Project) = (?,?);");
+                ps.setString(1, taskName);
+                ps.setString(2, projectName);
+                ResultSet resultSet = ps.executeQuery();
+                         
+                Task taskToMark = new Task();
+                
+                while (resultSet.next()) {
+                    taskToMark = (generateTask(resultSet));
+                }
+                resultSet.close();
+        		
+        		
+        		
+        		if(taskToMark.status == true) {
+            		logger.log("Marking Task Incomplete");
+        		}else {
+        			logger.log("Marking Task Complete");
+        		}
+        		
+        		ps = conn.prepareStatement("UPDATE " + tblName + " SET Status=? WHERE (Name,Project) = (?,?);");
+        		ps.setBoolean(1,!taskToMark.status);
+        		ps.setString(2, taskName);
+        		ps.setString(3, projectName);
+        		logger.log("Executing SQL Command");
+                int numAffected = ps.executeUpdate();
+                logger.log("numAffected: " + numAffected);
+                return (numAffected == 1);
+        	}catch(Exception e) {
+        		throw new Exception("Failed to change task marking");
+        	}
+        }
+        
 }
