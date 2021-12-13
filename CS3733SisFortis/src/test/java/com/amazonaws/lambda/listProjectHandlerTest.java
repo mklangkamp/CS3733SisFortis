@@ -65,7 +65,7 @@ public class listProjectHandlerTest {
     @Test 
     public void testListProject() {
     	String SAMPLE_INPUT = "{}";
-    	String RESULT = "[aProjectName, aProjectName2, aTestProjectName]";
+    	String RESULT = "[aa, abc, aTestProjectName]";
     	
     	try {
     		testInput(SAMPLE_INPUT, RESULT);
