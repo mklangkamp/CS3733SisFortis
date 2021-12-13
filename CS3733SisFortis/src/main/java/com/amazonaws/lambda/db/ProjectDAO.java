@@ -95,6 +95,41 @@ public class ProjectDAO {
         
     }
     
+    public boolean archiveProject(String projectName) throws Exception {
+    	try{
+    		//System.out.println("adding project");
+  	  		logger.log("archiving project");
+  	  		PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idProject = ?;");
+  	  		ps.setString(1, projectName);
+  	  		ResultSet resultSet = ps.executeQuery();
+        
+  	  		// exists?
+  	  		if (resultSet.next()) {
+  	  			logger.log("project exists");
+  	  			resultSet.close();
+  	  			// pass through
+  	  		}
+  	  		else {
+  	  			logger.log("project does not exist, exiting");
+	  			resultSet.close();
+	  			return false;
+  	  		}
+        
+  	  	//System.out.println("outside while loop");
+  	  	logger.log("building second ps");
+
+  	  	ps = conn.prepareStatement("UPDATE " + tblName + " SET Status = ? WHERE idProject = ?;");
+  	  	ps.setBoolean(1,  true);
+  	  	ps.setString(2, projectName);
+  	  	ps.execute();
+  	  	logger.log("updated db");
+  	  	return true;
+
+    } catch (Exception e) {
+        throw new Exception("Failed to add: " + e.getMessage());
+    }
+    }
+    
     private Project generateProject(ResultSet resultSet) throws Exception {
       String name  = resultSet.getString("idProject");
       boolean archived =  resultSet.getBoolean("archived");
