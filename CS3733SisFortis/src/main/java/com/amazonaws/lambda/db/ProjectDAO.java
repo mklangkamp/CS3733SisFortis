@@ -118,7 +118,7 @@ public class ProjectDAO {
   	  	//System.out.println("outside while loop");
   	  	logger.log("building second ps");
 
-  	  	ps = conn.prepareStatement("UPDATE " + tblName + " SET Status = ? WHERE idProject = ?;");
+  	  	ps = conn.prepareStatement("UPDATE " + tblName + " SET Archived = ? WHERE idProject = ?;");
   	  	ps.setBoolean(1,  true);
   	  	ps.setString(2, projectName);
   	  	ps.execute();
