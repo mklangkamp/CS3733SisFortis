@@ -191,5 +191,33 @@ java.sql.Connection conn;
     	return true;
 
       }
+    
+    public boolean removeTeammate(String idProject, String idTeammate) throws Exception {
+        try {
+      	  logger.log("removing teammate to tasks");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTeammate = ? AND idProject =?;");
+            ps.setString(1, idTeammate);
+            ps.setString(2, idProject);
+//            logger.log(idProject);
+            ResultSet resultSet = ps.executeQuery();
+//            ps.close();
+            
+            while (resultSet.next()) {
+                ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idTeammate = ? AND idProject = ?;");
+                ps.setString(1, idTeammate);
+                logger.log(idTeammate);
+                ps.setString(2, idProject);
+                logger.log(idProject);
+                ps.executeUpdate();
+//                resultSet.close();
+                return true;   
+            }
+
+        } catch (Exception e) {
+            throw new Exception("Failed to remove Teammate: " + e.getMessage());
+        }
+        
+        return false;
+    }
         
 }

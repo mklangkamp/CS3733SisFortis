@@ -21,6 +21,7 @@ import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.lambda.db.TeammateDAO;
+import com.amazonaws.lambda.db.TeammateToTaskDAO;
 import com.amazonaws.lambda.http.*;
 import com.amazonaws.lambda.model.Project;
 
@@ -31,11 +32,13 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 	private AmazonS3 s3 = null;
 	
 	TeammateDAO dao;
+	TeammateToTaskDAO ttotdao;
 	
     @Override
     public RemoveTeammateResponse handleRequest(RemoveTeammateRequest req, Context context) {
     	logger = context.getLogger();
     	dao = new TeammateDAO(logger);
+    	ttotdao = new TeammateToTaskDAO(logger);
     	logger.log("Loading Java Lambda handler of RemoveTeammateHandler");
 		logger.log(req.toString());
 		
@@ -46,6 +49,14 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 		}
 		catch(Exception e){
 			System.out.println("Could not remove teammate.");
+		}
+		
+		logger.log("ttot");
+		try {
+			ttotdao.removeTeammate(req.projectName, req.teammateName);
+		}
+		catch(Exception e){
+			System.out.println("Could not re-assign teammates to subtask.");
 		}
 		
 		RemoveTeammateResponse response = new RemoveTeammateResponse(req.teammateName, 200);
