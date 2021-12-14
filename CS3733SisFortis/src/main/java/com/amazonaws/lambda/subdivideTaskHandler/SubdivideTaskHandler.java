@@ -38,6 +38,7 @@ public class SubdivideTaskHandler implements RequestHandler<SubdivideTaskRequest
     public SubdivideTaskResponse handleRequest(SubdivideTaskRequest req, Context context) {
     	logger = context.getLogger();
     	taskdao = new TaskDAO(logger);
+    	ttotdao = new TeammateToTaskDAO(logger);
     	logger.log("Loading Java Lambda handler of SubdivideTaskHandler");
 		logger.log(req.toString());
 		
@@ -53,7 +54,7 @@ public class SubdivideTaskHandler implements RequestHandler<SubdivideTaskRequest
 			ttotdao.shiftTeammates(req.project, req.task);
 		}
 		catch(Exception e){
-			System.out.println("Could not add subtask.");
+			System.out.println("Could not re-assign teammates to subtask.");
 		}
 		
 		
