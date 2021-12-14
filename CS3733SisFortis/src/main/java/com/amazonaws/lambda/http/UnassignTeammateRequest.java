@@ -1,11 +1,6 @@
 package com.amazonaws.lambda.http;
 
-import java.util.ArrayList;
-
-import com.amazonaws.lambda.model.Project;
-import com.amazonaws.lambda.model.Teammate;
-
-public class AssignTeammateRequest {
+public class UnassignTeammateRequest {
 	public String teammateName;
 	public String idTask;
 	public String idProject;
@@ -14,17 +9,16 @@ public class AssignTeammateRequest {
 	public String getTaskName() {return this.idTask;}
 	public String geIdProject() {return this.idProject;}
 	
-	public AssignTeammateRequest(String idTask, String teammateName, String idProject) {
+	public UnassignTeammateRequest(String idTask, String teammateName, String idProject) {
 		this.idTask = idTask;
 		this.teammateName = teammateName;
 		this.idProject = idProject;
 	}
 	
-	public AssignTeammateRequest() {
+	public UnassignTeammateRequest() {
 	}
 	
 	public String toString() {
-		return "Requested to assign teammate with name: " + this.teammateName;
+		return "Requested to unassign teammate with name: " + this.teammateName;
 	}
-
 }

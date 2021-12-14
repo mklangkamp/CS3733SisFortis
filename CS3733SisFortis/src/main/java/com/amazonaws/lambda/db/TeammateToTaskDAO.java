@@ -159,5 +159,34 @@ java.sql.Connection conn;
 	    	}
 	    	return allTeammateTasks;
 }
+    public boolean unassignTeammate(String idTask, String teammateName, String idProject) throws Exception {
+        try {
+      	  logger.log("un-assigning teammate to task");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? AND idTeammate = ? AND idProject =?;");
+            ps.setString(1, idTask);
+            ps.setString(2, teammateName);
+            ps.setNString(3, idProject);
+//            logger.log(idProject);
+            ResultSet resultSet = ps.executeQuery();
+//            ps.close();
+            
+            while (resultSet.next()) {
+                ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idTask = ? AND idTeammate = ? AND idProject = ?;");
+                ps.setString(1, idTask);
+                logger.log(idTask);
+                ps.setString(2, teammateName);
+                logger.log(teammateName);
+                ps.setString(3, idProject);
+                logger.log(idProject);
+                ps.executeUpdate();
+//                resultSet.close();
+                return true;   
+            }
+
+        } catch (Exception e) {
+            throw new Exception("Failed to un-assign: " + e.getMessage());
+        }
         
+        return false;
+    }
 }
