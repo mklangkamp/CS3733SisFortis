@@ -177,12 +177,12 @@ java.sql.Connection conn;
 		        ps.setString(3, teammate);
 		        logger.log(teammate);
 		        ps.setString(4, task.idParent);
-		        ResultSet resultSet = ps.executeQuery();
+		        ps.executeUpdate();
 //		        resultSet.close();
     			}
     			catch(Exception e) {
 //    				throw new Exception("Failed to re-assign teammates to subtask 1: " + e.getMessage());
-    				logger.log("Failed to re-assign teammates to subtask 1: ");    			}
+    				logger.log("Failed to re-assign teammates to subtask 1: " + e.getMessage());    			}
     		});
     	}
     	catch(Exception e){
