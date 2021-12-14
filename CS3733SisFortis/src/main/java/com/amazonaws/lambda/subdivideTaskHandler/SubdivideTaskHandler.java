@@ -21,6 +21,7 @@ import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.lambda.db.TaskDAO;
+import com.amazonaws.lambda.db.TeammateToTaskDAO;
 import com.amazonaws.lambda.http.*;
 import com.amazonaws.lambda.model.Project;
 
@@ -30,23 +31,32 @@ public class SubdivideTaskHandler implements RequestHandler<SubdivideTaskRequest
 	
 	private AmazonS3 s3 = null;
 	
-	TaskDAO dao;
+	TaskDAO taskdao;
+	TeammateToTaskDAO ttotdao;
 	
     @Override
     public SubdivideTaskResponse handleRequest(SubdivideTaskRequest req, Context context) {
     	logger = context.getLogger();
-    	dao = new TaskDAO(logger);
+    	taskdao = new TaskDAO(logger);
+    	ttotdao = new TeammateToTaskDAO(logger);
     	logger.log("Loading Java Lambda handler of SubdivideTaskHandler");
 		logger.log(req.toString());
 		
-		
-		
 		try {
-			dao.addSubtask(req.project, req.task);
+			taskdao.addSubtask(req.project, req.task);
 		}
 		catch(Exception e){
 			System.out.println("Could not add subtask.");
 		}
+		
+		logger.log("ttot");
+		try {
+			ttotdao.shiftTeammates(req.project, req.task);
+		}
+		catch(Exception e){
+			System.out.println("Could not re-assign teammates to subtask.");
+		}
+		
 		
 		SubdivideTaskResponse response = new SubdivideTaskResponse(req.task.name, 200);
 		

@@ -159,5 +159,37 @@ java.sql.Connection conn;
 	    	}
 	    	return allTeammateTasks;
 }
+    
+    public boolean shiftTeammates(Project project, Task task) throws Exception {
+    	try {
+    		ArrayList<String> assignedTeammates = new ArrayList<>();
+    		assignedTeammates = getAllTaskTeammates(task.idParent, project.name);
+    		logger.log(task.idParent);
+    		assignedTeammates.forEach(teammate -> {
+    			try {
+    			logger.log("re-assigning teammates from task: " + task.idParent);
+		        PreparedStatement ps = conn.prepareStatement("UPDATE "+ tblName + " SET idTask = ?  WHERE idProject = ? AND idTeammate = ? AND idTask = ?;");
+//		        logger.log("UPDATE "+ tblName + " SET idTask= ? WHERE idProject = ? AND idTeammate = ? AND idTask = ?;");
+		        ps.setString(1, task.id);
+		        logger.log(task.id);
+		        ps.setString(2, project.name);
+		        logger.log(project.name);
+		        ps.setString(3, teammate);
+		        logger.log(teammate);
+		        ps.setString(4, task.idParent);
+		        ps.executeUpdate();
+//		        resultSet.close();
+    			}
+    			catch(Exception e) {
+//    				throw new Exception("Failed to re-assign teammates to subtask 1: " + e.getMessage());
+    				logger.log("Failed to re-assign teammates to subtask 1: " + e.getMessage());    			}
+    		});
+    	}
+    	catch(Exception e){
+    		throw new Exception("Failed to re-assign teammates to subtask 2: " + e.getMessage());
+    	}
+    	return true;
+
+      }
         
 }

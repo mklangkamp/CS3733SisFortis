@@ -51,7 +51,7 @@ public class AssignTeammateHandlerTest extends LambdaTest{
     @Test 
     public void testAssignTeammate() {
     	String SAMPLE_INPUT = "{\"idTask\": \"1\", \"teammateName\": \"Bob\", \"idProject\": \"abc\"}";
-    	String RESULT = "Bob";
+    	String RESULT = "Mitchell";
     	
     	try {
     		testInput(SAMPLE_INPUT, RESULT);
