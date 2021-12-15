@@ -240,7 +240,6 @@ java.sql.Connection conn;
                 ps.setString(1, idTeammate);
                 logger.log(idTeammate);
                 ps.setString(2, idProject);
-
                 logger.log(idProject);
                 ps.executeUpdate();
 //                resultSet.close();

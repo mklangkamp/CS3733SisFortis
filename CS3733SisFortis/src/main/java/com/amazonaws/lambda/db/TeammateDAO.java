@@ -69,7 +69,7 @@ java.sql.Connection conn;
         try {
       	  //System.out.println("adding project");
       	  logger.log("removing teammate");
-            PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE (idTeammate,Project) = (?,?);");
+            PreparedStatement ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idTeammate = ? AND Project = ?;");
             ps.setString(1, teammateName);
             ps.setString(2, projectName);
             int numAffected = ps.executeUpdate();
