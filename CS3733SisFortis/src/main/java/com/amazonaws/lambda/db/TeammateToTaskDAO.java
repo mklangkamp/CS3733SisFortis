@@ -159,6 +159,7 @@ java.sql.Connection conn;
 	    	}
 	    	return allTeammateTasks;
 }
+
     public boolean unassignTeammate(String idTask, String teammateName, String idProject) throws Exception {
         try {
       	  logger.log("un-assigning teammate to task");
@@ -166,17 +167,57 @@ java.sql.Connection conn;
             ps.setString(1, idTask);
             ps.setString(2, teammateName);
             ps.setNString(3, idProject);
+
+    
+    public boolean shiftTeammates(Project project, Task task) throws Exception {
+    	try {
+    		ArrayList<String> assignedTeammates = new ArrayList<>();
+    		assignedTeammates = getAllTaskTeammates(task.idParent, project.name);
+    		logger.log(task.idParent);
+    		assignedTeammates.forEach(teammate -> {
+    			try {
+    			logger.log("re-assigning teammates from task: " + task.idParent);
+		        PreparedStatement ps = conn.prepareStatement("UPDATE "+ tblName + " SET idTask = ?  WHERE idProject = ? AND idTeammate = ? AND idTask = ?;");
+//		        logger.log("UPDATE "+ tblName + " SET idTask= ? WHERE idProject = ? AND idTeammate = ? AND idTask = ?;");
+		        ps.setString(1, task.id);
+		        logger.log(task.id);
+		        ps.setString(2, project.name);
+		        logger.log(project.name);
+		        ps.setString(3, teammate);
+		        logger.log(teammate);
+		        ps.setString(4, task.idParent);
+		        ps.executeUpdate();
+//		        resultSet.close();
+    			}
+    			catch(Exception e) {
+//    				throw new Exception("Failed to re-assign teammates to subtask 1: " + e.getMessage());
+    				logger.log("Failed to re-assign teammates to subtask 1: " + e.getMessage());    			}
+    		});
+    	}
+    	catch(Exception e){
+    		throw new Exception("Failed to re-assign teammates to subtask 2: " + e.getMessage());
+    	}
+    	return true;
+
+      }
+    
+    public boolean removeTeammate(String idProject, String idTeammate) throws Exception {
+        try {
+      	  logger.log("removing teammate to tasks");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTeammate = ? AND idProject =?;");
+            ps.setString(1, idTeammate);
+            ps.setString(2, idProject);
+
 //            logger.log(idProject);
             ResultSet resultSet = ps.executeQuery();
 //            ps.close();
             
             while (resultSet.next()) {
-                ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idTask = ? AND idTeammate = ? AND idProject = ?;");
-                ps.setString(1, idTask);
-                logger.log(idTask);
-                ps.setString(2, teammateName);
-                logger.log(teammateName);
-                ps.setString(3, idProject);
+                ps = conn.prepareStatement("DELETE FROM " + tblName + " WHERE idTeammate = ? AND idProject = ?;");
+                ps.setString(1, idTeammate);
+                logger.log(idTeammate);
+                ps.setString(2, idProject);
+
                 logger.log(idProject);
                 ps.executeUpdate();
 //                resultSet.close();
@@ -184,7 +225,8 @@ java.sql.Connection conn;
             }
 
         } catch (Exception e) {
-            throw new Exception("Failed to un-assign: " + e.getMessage());
+
+            throw new Exception("Failed to remove Teammate: " + e.getMessage());
         }
         
         return false;

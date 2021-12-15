@@ -99,10 +99,12 @@
         var projectViewURL = APIURL + "projectView";
         var deleteProjectURL = APIURL + "deleteProject";
         var addTaskURL = APIURL + "addTasks";
-        var addTeammateURL = APIURL + "addTeammate"
-        var removeTeammateURL = APIURL + "removeTeammate"
+        var addTeammateURL = APIURL + "addTeammate";
+        var removeTeammateURL = APIURL + "removeTeammate";
         var archiveProjectURL = APIURL + "archiveProject";
-        var markTaskCompletedURL = APIURL + "markTask"
+        var markTaskCompletedURL = APIURL + "markTask";
+        var assignTeammateURL = APIURL + "assignTeammate";
+        var unassignTeammateURL = APIURL + "unassignTeammate";
 
 
         //Variables to allow hiding/unhiding of each webpage
@@ -118,8 +120,11 @@
         var teamViewDisplayData = "teamViewPlaceHolderData";
         var projectViewDisplayData = "projectViewPlaceHolderData";
 
-
+        //To make the green check marks
         var checkMark = "✅";
+
+        //To hold value of whether a project is archived.
+        var currentlyOpenProjectArchived = false;
 
 
         //GENERAL USE FUNCTIONS ---------------------------------------------------------
@@ -194,14 +199,6 @@
         }
 
         //ADMIN PAGE FUNCTIONS ---------------------------------------------------------
-        //Runs when the Archive Project button is pressed
-        function archiveProjectButtonPress(e){
-            var form = document.ArchiveProjectForm;
-
-            // form.AdminButton.value = textVal;
-            // document.getElementById("testP").innerHTML = "archive";
-        }
-
 
         function deleteProjectButtonPress(e){
             console.log("Deleting project");
@@ -264,7 +261,7 @@
         function archiveProjectButtonPress(e){
             console.log("Archiving project");
             var projectName = document.getElementById(highlightedRow).innerHTML;
-            // projectName = projectName.substr(projectName.indexOf(" "));
+            projectName = projectName.substr(0,projectName.lastIndexOf(" "));
 
 
             
@@ -502,6 +499,8 @@
             try {
                 project = js["project"];
                 projectName = project["name"];
+                currentlyOpenProjectArchived = project["archived"];
+                enableDisableProjectButtons(currentlyOpenProjectArchived);
                 document.getElementById("ProjectNameHeader").innerHTML = projectName + " Team View";
                 document.getElementById("ProjectViewHeader").innerHTML = projectName + " Project View";
                 document.getElementById("LandingPageNotification").innerHTML = "";//Remove previous text from landing page notification
@@ -514,6 +513,22 @@
                 document.getElementById("LandingPage").hidden = false;
                 document.getElementById("AdminPage").hidden = true;
                 document.getElementById("UserPage").hidden = true;
+            }
+        }
+
+        function enableDisableProjectButtons(disable){
+            document.getElementById("AddTaskButton").disabled = disable;
+            document.getElementById("AddSubtaskButton").disabled = disable;
+            document.getElementById("AssignTeammateButton").disabled = disable;
+            document.getElementById("UnassignTeammateButton").disabled = disable;
+            document.getElementById("MarkSelectedTaskButton").disabled = disable;
+
+            document.getElementById("AddTeammateButton").disabled = disable;
+            document.getElementById("RemoveTeammateButton").disabled = disable;
+
+            if(disable){
+                document.getElementById("ProjectViewNotification").innerHTML = "This Project is Archived."
+                document.getElementById("TeamViewNotification").innerHTML = "This Project is Archived." 
             }
         }
 
@@ -590,7 +605,7 @@
                     str = str + generateTaskString(task, rowNum,"");
                     rowNum = rowNum + 1;
                     
-                    var assignees = task["assignees"]
+                    var assignees = task["assignedTeammates"]
                     if (assignees != undefined){
                         assignees.forEach (assignee => {
                             str = str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + assignee + "</div>";
@@ -619,7 +634,7 @@
                     str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + teammate.name + "</div>";
                     rowNum = rowNum + 1
                     
-                    var tasks = teammate["tasks"]
+                    var tasks = teammate["taskList"]
                     if (tasks != undefined){
                         tasks.forEach (task => {
                             str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "</div>";
@@ -717,11 +732,16 @@
 
             //Determine the next top level task number available
             var idNum = 1;
+            var newIDNum = 1;
+
             while(document.getElementById(idNum) != null){
+                if(document.getElementById(idNum).innerHTML.charCodeAt(0) != 8195 && document.getElementById(idNum).innerHTML.indexOf(".") == -1){
+                    newIDNum = newIDNum + 1;
+                }
                 idNum = idNum + 1;
             }
 
-            task["id"] = idNum ;/////////////////////////////////////////////////////////////////////////////////// ADD CODE TO DETERMINE NEXT TASK ID
+            task["id"] = newIDNum ;
 
             var project = {};
             project["name"] = projectName;
@@ -906,7 +926,8 @@
         function removeTeammateButtonPress(){
             console.log("Removing Teammate");
             var teammateName = document.getElementById(highlightedRow).innerHTML;
-
+            
+            var projectName = document.testForm.textBox.value;
             //Remove tabs here if necessary
 
             var data = {};
@@ -947,10 +968,131 @@
             document.getElementById("TeamViewNotification").innerHTML = "Successfully removed teammate...";
         }
 
-        
-        
+
+        function AssignTeammateButtonPress(){
+
+            var taskName = document.getElementById(highlightedRow).innerHTML;
+
+            var taskID = taskName.substring(0,taskName.indexOf(" "));
+
+            var teammateName = document.getElementById("ProjectViewTeammateInput").value;
+
+            var projectName = document.testForm.textBox.value;
+
+            var data = {};
+            data["idProject"] = projectName;
+            data["teammateName"] = teammateName;
+            data["idTask"] = taskID;
 
 
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", assignTeammateURL, true);
+
+            
+            document.getElementById("ProjectViewNotification").innerHTML = "Assigning Teammate: " + teammateName + " to task# " + taskID + ".";
+            
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processAssignTeammateResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processAssignTeammateResponse("N/A");
+                }
+            };
+        }
+
+        
+        function processAssignTeammateResponse(result){
+            var js = JSON.parse(result);
+            
+
+            errorMsg = js["error"];
+            
+            //If teammate didnt already exist, add them, otherwise display error to screen
+            if(errorMsg == ""){
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully assigned teammate.";
+                openProject();
+            }else{
+                document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
+            }
+
+        }
+
+
+        function UnassignTeammateButtonPress(){
+
+            var taskName = document.getElementById(highlightedRow).innerHTML;
+
+            var taskID = taskName.substring(0,taskName.indexOf(" "));
+
+            var teammateName = document.getElementById("ProjectViewTeammateInput").value;
+
+            var projectName = document.testForm.textBox.value;
+
+            var data = {};
+            data["idProject"] = projectName;
+            data["teammateName"] = teammateName;
+            data["idTask"] = taskID;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", unassignTeammateURL, true);
+
+
+            document.getElementById("ProjectViewNotification").innerHTML = "Unassigning Teammate: " + teammateName + " from task# " + taskID + ".";
+
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processUnssignTeammateResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processUnassignTeammateResponse("N/A");
+                }
+            };
+            }
+
+
+            function processUnassignTeammateResponse(result){
+            var js = JSON.parse(result);
+
+            errorMsg = js["error"];
+
+            //If teammate didnt already exist, add them, otherwise display error to screen
+            if(errorMsg == ""){
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully unassigned teammate.";
+                openProject();
+            }else{
+                document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
+            }
+
+        }
+            
 
 
     </script>
