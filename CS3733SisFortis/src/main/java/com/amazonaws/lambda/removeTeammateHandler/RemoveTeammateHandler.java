@@ -42,7 +42,13 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
     	logger.log("Loading Java Lambda handler of RemoveTeammateHandler");
 		logger.log(req.toString());
 		
-		
+		logger.log("ttot");
+		try {
+			ttotdao.removeTeammate(req.projectName, req.teammateName);
+		}
+		catch(Exception e){
+			System.out.println("Could not re-assign teammates to subtask.");
+		}
 		
 		try {
 			dao.removeTeammate(req.projectName, req.teammateName);
@@ -51,13 +57,7 @@ public class RemoveTeammateHandler implements RequestHandler<RemoveTeammateReque
 			System.out.println("Could not remove teammate.");
 		}
 		
-		logger.log("ttot");
-		try {
-			ttotdao.removeTeammate(req.projectName, req.teammateName);
-		}
-		catch(Exception e){
-			System.out.println("Could not re-assign teammates to subtask.");
-		}
+
 		
 		RemoveTeammateResponse response = new RemoveTeammateResponse(req.teammateName, 200);
 		

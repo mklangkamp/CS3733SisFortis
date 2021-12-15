@@ -48,8 +48,8 @@ public class RemoveTeammateHandlerTest extends LambdaTest{
     
     @Test 
     public void testRemoveTeammate() {
-    	String SAMPLE_INPUT = "{\"projectName\": \"abc\", \"teammateName\": \"Bob\"}";
-    	String RESULT = "Bob";
+    	String SAMPLE_INPUT = "{\"projectName\": \"abc\", \"teammateName\": \"test\"}";
+    	String RESULT = "test";
     	
     	try {
     		testInput(SAMPLE_INPUT, RESULT);
