@@ -637,7 +637,11 @@
                     var tasks = teammate["taskList"]
                     if (tasks != undefined){
                         tasks.forEach (task => {
-                            str =  str + '\n' + "<div>" + tab + task.id + " " + task.name + "</div>";
+                            if(task.status == false){
+                                str =  str + '\n' + "<div>" + tab + task.id + " " + task.name + "</div>";
+                            }else{
+                                str =  str + '\n' + "<div>" + tab + task.id + " " + task.name + "&emsp;" + checkMark +"</div>";
+                            }
                         });
                     }
                 });    
