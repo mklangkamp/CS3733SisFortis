@@ -260,4 +260,38 @@ java.sql.Connection conn;
         	}
         }
         
+        
+        public boolean renameTask(Task task, String newName) throws Exception {
+        	try {
+            	  logger.log("renaming task");
+                  PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE Name = ? and Project = ?;");
+                  ps.setString(1, task.name);
+                  ps.setString(2, task.idProject);
+                  ResultSet resultSet = ps.executeQuery();
+                  
+                  if(resultSet.next()) {
+                      resultSet.close();
+                      logger.log("Task exists, attempting to rename");
+                  }else {
+                	  return false; //IF the task doesnt exist, dont try to rename
+                  }
+                  
+                  ps = conn.prepareStatement("UPDATE " + tblName + " SET Name = ? WHERE Name = ? and Project = ?");
+//                  UPDATE Project SET Archived=false WHERE idProject="abc";
+                  
+                  ps.setString(1, newName);
+                  ps.setString(2, task.name);
+                  ps.setString(3, task.idProject);
+                  // if this is a subtask, this should not be null (null for top level tasks only, iteration #2)
+                  //ps.setString(4, null);
+                  ps.execute();
+                  
+
+              } catch (Exception e) {
+                  throw new Exception("Failed to add: " + e.getMessage());
+              }
+        	
+        	return true;
+        }
+        
 }
