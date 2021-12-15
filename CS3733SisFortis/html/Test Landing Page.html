@@ -609,8 +609,7 @@
                     var assignees = task["assignedTeammates"]
                     if (assignees != undefined){
                         assignees.forEach (assignee => {
-                            str = str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + assignee + "</div>";
-                            rowNum = rowNum +1;
+                            str = str + '\n' + "<div>" + tab + assignee + "</div>";
                         });  
                     }
 
@@ -638,8 +637,7 @@
                     var tasks = teammate["taskList"]
                     if (tasks != undefined){
                         tasks.forEach (task => {
-                            str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "</div>";
-                            rowNum = rowNum +1;
+                            str =  str + '\n' + "<div>" + tab + task.id + " " + task.name + "</div>";
                         });
                     }
                 });    
