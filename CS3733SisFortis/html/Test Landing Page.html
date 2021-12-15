@@ -105,6 +105,8 @@
         var markTaskCompletedURL = APIURL + "markTask";
         var assignTeammateURL = APIURL + "assignTeammate";
         var unassignTeammateURL = APIURL + "unassignTeammate";
+        var subdivideTaskURL = APIURL + "decomposeTask";
+        var renameTaskURL = APIURL + "renameTask";
 
 
         //Variables to allow hiding/unhiding of each webpage
@@ -608,8 +610,7 @@
                     var assignees = task["assignedTeammates"]
                     if (assignees != undefined){
                         assignees.forEach (assignee => {
-                            str = str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + assignee + "</div>";
-                            rowNum = rowNum +1;
+                            str = str + '\n' + "<div>" + tab + assignee + "</div>";
                         });  
                     }
 
@@ -637,8 +638,11 @@
                     var tasks = teammate["taskList"]
                     if (tasks != undefined){
                         tasks.forEach (task => {
-                            str =  str + '\n' + "<div name=\"" + rowNum + "\" id=\"" + rowNum + "\">" + tab + task.id + " " + task.name + "</div>";
-                            rowNum = rowNum +1;
+                            if(task.status == false){
+                                str =  str + '\n' + "<div>" + tab + task.id + " " + task.name + "</div>";
+                            }else{
+                                str =  str + '\n' + "<div>" + tab + task.id + " " + task.name + "&emsp;" + checkMark +"</div>";
+                            }
                         });
                     }
                 });    
@@ -1023,8 +1027,8 @@
             
             //If teammate didnt already exist, add them, otherwise display error to screen
             if(errorMsg == ""){
-                document.getElementById("ProjectViewNotification").innerHTML = "Successfully assigned teammate.";
                 openProject();
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully assigned teammate.";
             }else{
                 document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
             }
@@ -1067,7 +1071,7 @@
                 if (xhr.readyState == XMLHttpRequest.DONE){
                     if(xhr.status == 200){
                         console.log("XHR:" + xhr.responseText);
-                        processUnssignTeammateResponse(xhr.responseText);
+                        processUnassignTeammateResponse(xhr.responseText);
                     }else if(xhr.status == 400){
                         alert("Unable to process request");
                     }
@@ -1078,19 +1082,185 @@
             }
 
 
-            function processUnassignTeammateResponse(result){
+        function processUnassignTeammateResponse(result){
             var js = JSON.parse(result);
 
             errorMsg = js["error"];
 
             //If teammate didnt already exist, add them, otherwise display error to screen
             if(errorMsg == ""){
+                openProject();
                 document.getElementById("ProjectViewNotification").innerHTML = "Successfully unassigned teammate.";
+            }else{
+                document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
+            }
+
+        }
+
+
+        
+        function addSubtaskButtonPress(){
+
+            var parentTaskName = document.getElementById(highlightedRow).innerHTML;
+
+            var parentTaskID = parentTaskName.substring(0,parentTaskName.indexOf(" "));
+
+            //Determine next task number for the new subdivided task
+
+            var newTaskNumNotFound = true;
+            var divNum = highlightedRow;
+            while(document.getElementById(divNum).innerHTML.indexOf(parentTaskID) != -1){
+                divNum = divNum + 1;
+            }
+            //element ID of last row with that parent ID
+            divNum = divNum - 1;
+
+            //if the highlighted row is the last instance of this parentID, then the next value is ParentID + ".1"
+            if(divNum == highlightedRow){
+                var childTaskNum = parentTaskID + ".1";
+            }else{
+                //Get the last task with that parent task number
+                var childTaskNum = document.getElementById(divNum).innerHTML;
+
+                //Remove everything after the task ID number, and everything that is the parent task ID
+                childTaskNum = childTaskNum.substring(parentTaskID.length + 1,childTaskNum.indexOf(" "));
+                
+                //If there are multiple subdivisions, then remove after the first set of subdivisions
+                if(childTaskNum.indexOf(".") == -1){
+                    childTaskNum = parseInt(childTaskNum) + 1; //Add one since this is the value of the last existing task
+                }else{
+                    childTaskNum = childTaskNum.substring(0,childTaskNum.indexOf("."));
+                    childTaskNum = parseInt(childTaskNum) + 1;
+                }
+
+                childTaskNum = parentTaskID + "." + childTaskNum.toString();
+            }
+
+
+            var childTaskName = document.getElementById("ProjectViewTaskInput").value;
+
+            var projectName = document.testForm.textBox.value;
+
+            var project = {};
+            project["name"] = projectName;
+
+            var task = {};
+            task["name"] = childTaskName;
+            task["idParent"] = parentTaskID;
+            task["idProject"] = projectName;
+            task["id"] = childTaskNum
+
+            var data = {};
+            data["project"] = project;
+            data["task"] = task;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", subdivideTaskURL, true);
+
+
+            document.getElementById("ProjectViewNotification").innerHTML = "Subdividing task: " + parentTaskID;
+
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processSubdivideTaskResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processSubdivideTaskResponse("N/A");
+                }
+            };
+        }
+
+
+        function processSubdivideTaskResponse(result){
+            var js = JSON.parse(result);
+
+            errorMsg = js["error"];
+
+            //If teammate didnt already exist, add them, otherwise display error to screen
+            if(errorMsg == ""){
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully subdivided task.";
                 openProject();
             }else{
                 document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
             }
 
+        }
+
+
+
+        function renameTaskButtonPress(){
+            var newTaskName = document.getElementById("ProjectViewTaskInput").value;
+            var projectName = document.testForm.textBox.value;
+
+            //Remove the id # and checkmark from the task name
+            var taskName = document.getElementById(highlightedRow).innerHTML;
+
+            if(taskName.indexOf(checkMark) == -1){
+                taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-1);
+            }else{
+                taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-2);
+            }
+
+            var task = {};
+            task["name"] = taskName;
+            task["idProject"] = projectName;
+
+            var data = {};
+            data["task"] = task;
+            data["newName"] = newTaskName;
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", renameTaskURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            document.getElementById("ProjectViewNotification").innerHTML = "Working on renaming task...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processRenameTaskResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processRenameTaskResponse("N/A");
+                }
+            };
+        }
+
+        function processRenameTaskResponse(result){
+            var js = JSON.parse(result);
+
+            errorMsg = js["error"];
+
+            if(errorMsg == ""){
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully renamed task.";
+                openProject();
+            }else{
+                document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
+            }
         }
             
 
@@ -1350,11 +1520,15 @@
                 
                 
                 <form name="AddTaskForm" method="post"> 
-                    <input type="button" value="Add New Task(s)" class="button" id="AddTaskButton" onclick="JavaScript:addTaskButtonPress()"></button>
+                    <input type="button" value="Add New Task" class="button" id="AddTaskButton" onclick="JavaScript:addTaskButtonPress()"></button>
                 </form>
 
                 <form name="AddNewSubTasks" method="post" >
-                    <input type="button" value="Add New Subtask(s)" class="button" id="AddSubtaskButton" onclick="JavaScript:addSubtaskButtonPress()"></button>
+                    <input type="button" value="Add New Subtask" class="button" id="AddSubtaskButton" onclick="JavaScript:addSubtaskButtonPress()"></button>
+                </form>
+
+                <form name="RenameTask" method="post" >
+                    <input type="button" value="Rename Task" class="button" id="RenameTaskButton" onclick="JavaScript:renameTaskButtonPress()"></button>
                 </form>
                 
                 <br style="line-height: 30px;">
