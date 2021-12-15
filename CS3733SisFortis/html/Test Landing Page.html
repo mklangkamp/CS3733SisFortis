@@ -105,6 +105,7 @@
         var markTaskCompletedURL = APIURL + "markTask";
         var assignTeammateURL = APIURL + "assignTeammate";
         var unassignTeammateURL = APIURL + "unassignTeammate";
+        var subdivideTaskURL = APIURL + "decomposeTask"
 
 
         //Variables to allow hiding/unhiding of each webpage
@@ -1023,8 +1024,8 @@
             
             //If teammate didnt already exist, add them, otherwise display error to screen
             if(errorMsg == ""){
-                document.getElementById("ProjectViewNotification").innerHTML = "Successfully assigned teammate.";
                 openProject();
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully assigned teammate.";
             }else{
                 document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
             }
@@ -1067,7 +1068,7 @@
                 if (xhr.readyState == XMLHttpRequest.DONE){
                     if(xhr.status == 200){
                         console.log("XHR:" + xhr.responseText);
-                        processUnssignTeammateResponse(xhr.responseText);
+                        processUnassignTeammateResponse(xhr.responseText);
                     }else if(xhr.status == 400){
                         alert("Unable to process request");
                     }
@@ -1078,20 +1079,123 @@
             }
 
 
-            function processUnassignTeammateResponse(result){
+        function processUnassignTeammateResponse(result){
             var js = JSON.parse(result);
 
             errorMsg = js["error"];
 
             //If teammate didnt already exist, add them, otherwise display error to screen
             if(errorMsg == ""){
-                document.getElementById("ProjectViewNotification").innerHTML = "Successfully unassigned teammate.";
                 openProject();
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully unassigned teammate.";
             }else{
                 document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
             }
 
         }
+
+
+        
+        function addSubtaskButtonPress(){
+
+            var parentTaskName = document.getElementById(highlightedRow).innerHTML;
+
+            var parentTaskID = parentTaskName.substring(0,parentTaskName.indexOf(" "));
+
+            //Determine next task number for the new subdivided task
+
+            var newTaskNumNotFound = true;
+            var divNum = highlightedRow;
+            while(document.getElementById(divNum).innerHTML.indexOf(parentTaskID) != -1){
+                divNum = divNum + 1;
+            }
+            //element ID of last row with that parent ID
+            divNum = divNum - 1;
+
+            //if the highlighted row is the last instance of this parentID, then the next value is ParentID + ".1"
+            if(divNum == highlightedRow){
+                var childTaskNum = parentTaskID + ".1";
+            }else{
+                //Get the last task with that parent task number
+                var childTaskNum = document.getElementById(divNum).innerHTML;
+
+                //Remove everything after the task ID number, and everything that is the parent task ID
+                childTaskNum = childTaskNum.substring(parentTaskID.length + 1,childTaskNum.indexOf(" "));
+                
+                //If there are multiple subdivisions, then remove after the first set of subdivisions
+                if(childTaskNum.indexOf(".") == -1){
+                    childTaskNum = parseInt(childTaskNum) + 1; //Add one since this is the value of the last existing task
+                }else{
+                    childTaskNum = childTaskNum.substring(0,childTaskNum.indexOf("."));
+                    childTaskNum = parseInt(childTaskNum) + 1;
+                }
+
+                childTaskNum = parentTaskID + "." + childTaskNum.toString();
+            }
+
+
+            var childTaskName = document.getElementById("ProjectViewTaskInput").value;
+
+            var projectName = document.testForm.textBox.value;
+
+            var project = {};
+            project["name"] = projectName;
+
+            var task = {};
+            task["name"] = childTaskName;
+            task["idParent"] = parentTaskID;
+            task["idProject"] = projectName;
+            task["id"] = childTaskNum
+
+            var data = {};
+            data["project"] = project;
+            data["task"] = task;
+
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", subdivideTaskURL, true);
+
+
+            document.getElementById("ProjectViewNotification").innerHTML = "Subdividing task: " + parentTaskID;
+
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processSubdivideTaskResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processSubdivideTaskResponse("N/A");
+                }
+            };
+            }
+
+
+        function processSubdivideTaskResponse(result){
+            var js = JSON.parse(result);
+
+            errorMsg = js["error"];
+
+            //If teammate didnt already exist, add them, otherwise display error to screen
+            if(errorMsg == ""){
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully subdivided task.";
+                openProject();
+            }else{
+                document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
+            }
+
+            }
             
 
 
