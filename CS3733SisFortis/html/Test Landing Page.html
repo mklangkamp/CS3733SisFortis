@@ -3,6 +3,7 @@
      //#2: modify the lambda to make it so that it pulls the task from the table, determines its status, and marks it the opposite. -->
 
 <html>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <style>
         body{
             font-family: Arial, Helvetica, sans-serif;
@@ -524,7 +525,8 @@
             document.getElementById("AssignTeammateButton").disabled = disable;
             document.getElementById("UnassignTeammateButton").disabled = disable;
             document.getElementById("MarkSelectedTaskButton").disabled = disable;
-
+            document.getElementById("RenameTaskButton").disabled = disable;
+            
             document.getElementById("AddTeammateButton").disabled = disable;
             document.getElementById("RemoveTeammateButton").disabled = disable;
 
@@ -1109,8 +1111,13 @@
 
             var newTaskNumNotFound = true;
             var divNum = highlightedRow;
-            while(document.getElementById(divNum).innerHTML.indexOf(parentTaskID) != -1){
-                divNum = divNum + 1;
+            
+            try{
+                while(document.getElementById(divNum).innerHTML.indexOf(parentTaskID) != -1){
+                    divNum = divNum + 1;
+                }
+            }catch{
+                
             }
             //element ID of last row with that parent ID
             divNum = divNum - 1;
