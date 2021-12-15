@@ -159,6 +159,15 @@ java.sql.Connection conn;
 	    	}
 	    	return allTeammateTasks;
 }
+
+    public boolean unassignTeammate(String idTask, String teammateName, String idProject) throws Exception {
+        try {
+      	  logger.log("un-assigning teammate to task");
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTask = ? AND idTeammate = ? AND idProject =?;");
+            ps.setString(1, idTask);
+            ps.setString(2, teammateName);
+            ps.setNString(3, idProject);
+
     
     public boolean shiftTeammates(Project project, Task task) throws Exception {
     	try {
@@ -198,6 +207,7 @@ java.sql.Connection conn;
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM " + tblName + " WHERE idTeammate = ? AND idProject =?;");
             ps.setString(1, idTeammate);
             ps.setString(2, idProject);
+
 //            logger.log(idProject);
             ResultSet resultSet = ps.executeQuery();
 //            ps.close();
@@ -207,6 +217,7 @@ java.sql.Connection conn;
                 ps.setString(1, idTeammate);
                 logger.log(idTeammate);
                 ps.setString(2, idProject);
+
                 logger.log(idProject);
                 ps.executeUpdate();
 //                resultSet.close();
@@ -214,10 +225,10 @@ java.sql.Connection conn;
             }
 
         } catch (Exception e) {
+
             throw new Exception("Failed to remove Teammate: " + e.getMessage());
         }
         
         return false;
     }
-        
 }
