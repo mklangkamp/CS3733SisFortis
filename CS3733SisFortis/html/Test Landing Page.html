@@ -105,7 +105,8 @@
         var markTaskCompletedURL = APIURL + "markTask";
         var assignTeammateURL = APIURL + "assignTeammate";
         var unassignTeammateURL = APIURL + "unassignTeammate";
-        var subdivideTaskURL = APIURL + "decomposeTask"
+        var subdivideTaskURL = APIURL + "decomposeTask";
+        var renameTaskURL = APIURL + "renameTask";
 
 
         //Variables to allow hiding/unhiding of each webpage
@@ -1181,7 +1182,7 @@
                     processSubdivideTaskResponse("N/A");
                 }
             };
-            }
+        }
 
 
         function processSubdivideTaskResponse(result){
@@ -1197,7 +1198,70 @@
                 document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
             }
 
+        }
+
+
+
+        function renameTaskButtonPress(){
+            var newTaskName = document.getElementById("ProjectViewTaskInput").value;
+            var projectName = document.testForm.textBox.value;
+
+            //Remove the id # and checkmark from the task name
+            var taskName = document.getElementById(highlightedRow).innerHTML;
+
+            if(taskName.indexOf(checkMark) == -1){
+                taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-1);
+            }else{
+                taskName = taskName.substring(taskName.indexOf(" ") + 1,taskName.length-2);
             }
+
+            var task = {};
+            task["name"] = taskName;
+            task["idProject"] = projectName;
+
+            var data = {};
+            data["task"] = task;
+            data["newName"] = newTaskName;
+
+            var js = JSON.stringify(data);
+            console.log("JS:" + js);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", renameTaskURL, true);
+
+            //Send the data as JSON
+            xhr.send(js);
+
+            document.getElementById("ProjectViewNotification").innerHTML = "Working on renaming task...";
+
+            //Process result
+            xhr.onloadend = function (){
+                console.log(xhr);
+                console.log(xhr.request);
+                if (xhr.readyState == XMLHttpRequest.DONE){
+                    if(xhr.status == 200){
+                        console.log("XHR:" + xhr.responseText);
+                        processRenameTaskResponse(xhr.responseText);
+                    }else if(xhr.status == 400){
+                        alert("Unable to process request");
+                    }
+                }else{
+                    processRenameTaskResponse("N/A");
+                }
+            };
+        }
+
+        function processRenameTaskResponse(result){
+            var js = JSON.parse(result);
+
+            errorMsg = js["error"];
+
+            if(errorMsg == ""){
+                document.getElementById("ProjectViewNotification").innerHTML = "Successfully renamed task.";
+                openProject();
+            }else{
+                document.getElementById("ProjectViewNotification").innerHTML = errorMsg;
+            }
+        }
             
 
 
@@ -1456,11 +1520,15 @@
                 
                 
                 <form name="AddTaskForm" method="post"> 
-                    <input type="button" value="Add New Task(s)" class="button" id="AddTaskButton" onclick="JavaScript:addTaskButtonPress()"></button>
+                    <input type="button" value="Add New Task" class="button" id="AddTaskButton" onclick="JavaScript:addTaskButtonPress()"></button>
                 </form>
 
                 <form name="AddNewSubTasks" method="post" >
-                    <input type="button" value="Add New Subtask(s)" class="button" id="AddSubtaskButton" onclick="JavaScript:addSubtaskButtonPress()"></button>
+                    <input type="button" value="Add New Subtask" class="button" id="AddSubtaskButton" onclick="JavaScript:addSubtaskButtonPress()"></button>
+                </form>
+
+                <form name="RenameTask" method="post" >
+                    <input type="button" value="Rename Task" class="button" id="RenameTaskButton" onclick="JavaScript:renameTaskButtonPress()"></button>
                 </form>
                 
                 <br style="line-height: 30px;">
